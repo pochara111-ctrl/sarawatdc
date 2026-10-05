@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>หน้าหลัก | สารวัตรนักเรียน โรงเรียนเดชะปัตตนยานุกูล</title>
-    <meta name="description" content="เว็บไซต์ศูนย์กลาง (Portal) คณะสารวัตรนักเรียน โรงเรียนเดชะปัตตนยานุกูล เชื่อมต่อระบบแจ้งเหตุ ร้องเรียน และการปฏิบัติงาน">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Prompt:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Prompt:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,19 +16,24 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        kanit: ['Kanit', 'sans-serif'],
-                        prompt: ['Prompt', 'sans-serif'],
-                    },
                     colors: {
-                        green: {
-                            primary: '#064e3b', // Emerald 900
-                            secondary: '#059669', // Emerald 600
-                            light: '#d1fae5', // Emerald 100
+                        green: { primary: '#064e3b', secondary: '#059669', glow: '#10b981' },
+                        yellow: { accent: '#f59e0b', light: '#fef3c7' }
+                    },
+                    animation: {
+                        'gradient-x': 'gradient-x 4s ease infinite',
+                        'float': 'float 8s ease-in-out infinite',
+                        'float-delayed': 'float 8s ease-in-out 4s infinite',
+                        'spin-slow': 'spin 12s linear infinite',
+                    },
+                    keyframes: {
+                        'gradient-x': {
+                            '0%, 100%': { 'background-size': '200% 200%', 'background-position': 'left center' },
+                            '50%': { 'background-size': '200% 200%', 'background-position': 'right center' },
                         },
-                        yellow: {
-                            accent: '#f59e0b', // Amber 500
-                            light: '#fef3c7', // Amber 50
+                        'float': {
+                            '0%, 100%': { transform: 'translateY(0) scale(1)' },
+                            '50%': { transform: 'translateY(-30px) scale(1.05)' },
                         }
                     }
                 }
@@ -37,187 +41,163 @@
         }
     </script>
     
-    <!-- FontAwesome -->
+    <!-- FontAwesome & SweetAlert2 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- AOS Animation CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
     <style>
-        /* Custom Styles & Animations */
-        body {
-            font-family: 'Kanit', sans-serif;
-            background-color: #f8fafc;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-        }
+        body { font-family: 'Kanit', sans-serif; background-color: #0f172a; overflow-x: hidden; color: #f8fafc; }
+        h1, h2, h3, h4 { font-family: 'Prompt', sans-serif; }
 
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Prompt', sans-serif;
-        }
-
-        /* Glassmorphism */
+        /* Premium Glassmorphism */
         .glass-nav {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
 
-        /* Smooth Scrolling */
-        html { scroll-behavior: smooth; }
-
-        /* Reveal Animations */
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
-        }
-
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Custom Gradients */
-        .bg-gradient-green-yellow {
-            background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
-        }
-
-        .text-gradient {
-            background: linear-gradient(135deg, #f59e0b, #fcd34d);
+        /* Animated Text Gradient */
+        .text-gradient-animated {
+            background: linear-gradient(to right, #34d399, #fcd34d, #34d399);
+            background-size: 200% auto;
+            color: transparent;
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shine 3s linear infinite;
         }
 
-        /* Card Hover Effects */
-        .hover-lift {
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+        @keyframes shine {
+            to { background-position: 200% center; }
         }
 
-        .hover-lift:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 40px -10px rgba(6, 78, 59, 0.15);
-        }
-
-        /* Hero Background Pattern */
-        .hero-bg {
-            background-image: radial-gradient(rgba(5, 150, 105, 0.1) 1px, transparent 1px);
-            background-size: 30px 30px;
-        }
-
-        /* Animated Background Blobs */
-        .blob {
+        /* Hero Mesh Gradient Background */
+        .mesh-bg {
             position: absolute;
-            filter: blur(80px);
+            inset: 0;
+            z-index: -2;
+            background-color: #022c22;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(5, 150, 105, 0.4) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(245, 158, 11, 0.3) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(6, 78, 59, 0.8) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(2, 6, 23, 1) 0px, transparent 50%);
+            filter: blur(40px);
+        }
+
+        /* Grid Pattern */
+        .grid-pattern {
+            position: absolute;
+            inset: 0;
             z-index: -1;
-            opacity: 0.4;
-            animation: float 10s infinite ease-in-out alternate;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
         }
 
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, -50px) scale(1.1); }
+        /* 3D Tilt Card Glow */
+        .tilt-card { transform-style: preserve-3d; }
+        .tilt-content { transform: translateZ(30px); }
+        .tilt-icon { transform: translateZ(50px); }
+
+        .glow-hover:hover {
+            box-shadow: 0 0 40px -10px var(--hover-color);
+            border-color: rgba(255,255,255,0.3);
         }
 
-        /* Loader */
-        .loader {
-            border: 3px solid rgba(5, 150, 105, 0.1);
-            border-top-color: #059669;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #059669; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
     </style>
 </head>
-<body class="text-slate-800 antialiased selection:bg-green-primary selection:text-white relative">
+<body class="relative">
 
-    <!-- Background Blobs -->
-    <div class="blob bg-green-secondary w-96 h-96 rounded-full top-0 left-0 -translate-x-1/2 -translate-y-1/2"></div>
-    <div class="blob bg-yellow-accent w-80 h-80 rounded-full top-1/4 right-0 translate-x-1/3"></div>
+    <!-- Deep Backgrounds -->
+    <div class="mesh-bg"></div>
+    <div class="grid-pattern"></div>
+    
+    <!-- Floating Particles -->
+    <div class="absolute top-20 left-10 w-32 h-32 bg-green-500/20 rounded-full blur-3xl animate-float"></div>
+    <div class="absolute bottom-40 right-20 w-48 h-48 bg-yellow-500/20 rounded-full blur-3xl animate-float-delayed"></div>
 
     <!-- Navigation -->
-    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 py-4">
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-500 py-4">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="glass-nav rounded-2xl px-6 py-3 flex justify-between items-center transition-all">
+            <div class="glass-nav rounded-full px-6 py-3 flex justify-between items-center transition-all duration-300 border border-white/10">
                 <!-- Logo -->
-                <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
-                    <div class="w-10 h-10 bg-gradient-green-yellow rounded-full flex items-center justify-center text-white shadow-md">
-                        <i class="fa-solid fa-shield-halved text-lg"></i>
+                <div class="flex items-center gap-3 cursor-pointer group" onclick="window.scrollTo(0,0)">
+                    <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-800 rounded-full flex items-center justify-center text-white shadow-[0_0_15px_rgba(5,150,105,0.5)] group-hover:shadow-[0_0_25px_rgba(5,150,105,0.8)] transition-all duration-500">
+                        <i class="fa-solid fa-shield-halved text-xl group-hover:scale-110 transition-transform duration-300"></i>
                     </div>
                     <div>
-                        <h1 class="font-prompt font-bold text-lg leading-tight text-green-primary">สารวัตรนักเรียน</h1>
-                        <p class="text-[10px] text-slate-500 font-medium tracking-wide">โรงเรียนเดชะปัตตนยานุกูล</p>
+                        <h1 class="font-prompt font-extrabold text-xl leading-tight text-white tracking-wide">สารวัตรนักเรียน</h1>
+                        <p class="text-[11px] text-green-300 font-medium tracking-widest uppercase">Dechapattanayanukul</p>
                     </div>
                 </div>
 
                 <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center gap-1 bg-slate-50/50 p-1 rounded-full border border-slate-200/50">
-                    <a href="#home" class="px-5 py-2 rounded-full text-sm font-medium hover:bg-white hover:text-green-secondary transition-all hover:shadow-sm">หน้าแรก</a>
-                    <a href="#systems" class="px-5 py-2 rounded-full text-sm font-medium hover:bg-white hover:text-green-secondary transition-all hover:shadow-sm">ระบบงาน</a>
-                    <a href="#news" class="px-5 py-2 rounded-full text-sm font-medium hover:bg-white hover:text-green-secondary transition-all hover:shadow-sm">ข่าวประชาสัมพันธ์</a>
-                    <a href="#personnel" class="px-5 py-2 rounded-full text-sm font-medium hover:bg-white hover:text-green-secondary transition-all hover:shadow-sm">บุคลากร</a>
+                <div class="hidden md:flex items-center gap-2 bg-white/5 p-1.5 rounded-full border border-white/10 backdrop-blur-md">
+                    <a href="#home" class="px-5 py-2 rounded-full text-sm font-medium text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-300">หน้าแรก</a>
+                    <a href="#systems" class="px-5 py-2 rounded-full text-sm font-medium text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-300">ระบบงาน</a>
+                    <a href="#news" class="px-5 py-2 rounded-full text-sm font-medium text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-300">ข่าวสาร</a>
+                    <a href="#personnel" class="px-5 py-2 rounded-full text-sm font-medium text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-300">บุคลากร</a>
                 </div>
 
                 <!-- Admin & Mobile Toggle -->
                 <div class="flex items-center gap-3">
-                    <button onclick="adminManager.checkAuth()" class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-green-primary transition-colors text-sm font-medium">
+                    <button onclick="adminManager.checkAuth()" class="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-green-600 to-emerald-500 text-white hover:from-green-500 hover:to-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] transition-all duration-300 text-sm font-semibold">
                         <i class="fa-solid fa-user-shield"></i>
                         <span id="admin-status-text">ผู้ดูแลระบบ</span>
                     </button>
-                    <button id="mobile-menu-btn" class="md:hidden w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-slate-200 transition-colors rounded-full text-slate-600">
+                    <button id="mobile-menu-btn" class="md:hidden w-10 h-10 flex items-center justify-center bg-white/10 rounded-full text-white border border-white/20">
                         <i class="fa-solid fa-bars"></i>
                     </button>
                 </div>
             </div>
         </div>
-        
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="absolute top-full left-0 w-full px-4 pt-2 hidden opacity-0 transition-opacity duration-300">
-            <div class="glass-nav rounded-2xl p-4 flex flex-col gap-2">
-                <a href="#home" class="mobile-link p-3 rounded-xl hover:bg-green-50 text-slate-700 font-medium flex items-center gap-3"><i class="fa-solid fa-house w-5 text-center text-green-secondary"></i> หน้าแรก</a>
-                <a href="#systems" class="mobile-link p-3 rounded-xl hover:bg-green-50 text-slate-700 font-medium flex items-center gap-3"><i class="fa-solid fa-layer-group w-5 text-center text-green-secondary"></i> ระบบงาน</a>
-                <a href="#news" class="mobile-link p-3 rounded-xl hover:bg-green-50 text-slate-700 font-medium flex items-center gap-3"><i class="fa-solid fa-newspaper w-5 text-center text-green-secondary"></i> ข่าวประชาสัมพันธ์</a>
-                <a href="#personnel" class="mobile-link p-3 rounded-xl hover:bg-green-50 text-slate-700 font-medium flex items-center gap-3"><i class="fa-solid fa-users w-5 text-center text-green-secondary"></i> บุคลากร</a>
-                <div class="h-px bg-slate-200 my-2"></div>
-                <button onclick="adminManager.checkAuth()" class="mobile-link p-3 rounded-xl bg-slate-100 text-slate-700 font-medium flex items-center gap-3 w-full text-left">
-                    <i class="fa-solid fa-user-shield w-5 text-center text-slate-500"></i> เข้าสู่ระบบผู้ดูแล
-                </button>
-            </div>
-        </div>
     </nav>
 
     <!-- Hero Section -->
-    <section id="home" class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden hero-bg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center max-w-3xl mx-auto reveal">
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 border border-green-200 text-green-primary text-sm font-semibold tracking-wide mb-6 shadow-sm">
-                    <span class="relative flex h-2 w-2">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-secondary opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-2 w-2 bg-green-secondary"></span>
+    <section id="home" class="relative pt-40 pb-24 lg:pt-56 lg:pb-32 overflow-hidden flex items-center min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+            <div class="text-center max-w-4xl mx-auto">
+                <div data-aos="fade-down" data-aos-duration="1000" class="inline-flex items-center gap-3 px-5 py-2 rounded-full glass-card text-green-300 text-sm font-semibold tracking-wider mb-8 border-green-500/30">
+                    <span class="relative flex h-2.5 w-2.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
                     </span>
-                    ยินดีต้อนรับสู่ศูนย์กลางระบบสารวัตรนักเรียน
+                    ยินดีต้อนรับสู่ระบบสารสนเทศ
                 </div>
                 
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-prompt font-extrabold text-slate-900 leading-tight tracking-tight mb-6">
+                <h1 data-aos="zoom-in" data-aos-duration="1200" class="text-5xl md:text-7xl lg:text-8xl font-prompt font-black text-white leading-tight tracking-tight mb-6">
                     สร้างระเบียบวินัย <br/>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-primary to-green-secondary">เพื่อสังคมคุณภาพ</span>
+                    <span class="text-gradient-animated">เพื่อสังคมคุณภาพ</span>
                 </h1>
                 
-                <p class="text-lg text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-                    เว็บไซต์ศูนย์กลาง (Portal) คณะสารวัตรนักเรียน โรงเรียนเดชะปัตตนยานุกูล เชื่อมต่อทุกระบบงานเพื่อการบริหารจัดการและการให้บริการที่รวดเร็ว โปร่งใส และมีประสิทธิภาพ
+                <p data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200" class="text-lg md:text-xl text-slate-300 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
+                    พอร์ทัลศูนย์กลางคณะสารวัตรนักเรียน โรงเรียนเดชะปัตตนยานุกูล เชื่อมต่อทุกระบบเพื่อการทำงานที่รวดเร็วและโปร่งใส
                 </p>
                 
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="#systems" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-green-primary text-white font-medium hover:bg-green-secondary transition-colors shadow-lg shadow-green-900/20 flex items-center justify-center gap-2 group">
-                        เข้าสู่ระบบงาน <i class="fa-solid fa-arrow-down transition-transform group-hover:translate-y-1"></i>
+                <div data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400" class="flex flex-col sm:flex-row items-center justify-center gap-5">
+                    <a href="#systems" class="w-full sm:w-auto px-8 py-4 rounded-full bg-white text-green-900 font-bold hover:scale-105 transition-transform duration-300 shadow-[0_0_30px_rgba(255,255,255,0.2)] flex items-center justify-center gap-3">
+                        เริ่มต้นใช้งาน <i class="fa-solid fa-arrow-down animate-bounce"></i>
                     </a>
-                    <a href="#news" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-white text-slate-700 font-medium hover:bg-slate-50 border border-slate-200 transition-colors shadow-sm flex items-center justify-center gap-2">
-                        <i class="fa-regular fa-newspaper text-green-secondary"></i> อ่านข่าวสาร
+                    <a href="#news" class="w-full sm:w-auto px-8 py-4 rounded-full glass-card text-white font-medium hover:bg-white/10 transition-colors duration-300 flex items-center justify-center gap-3">
+                        <i class="fa-regular fa-newspaper text-yellow-400"></i> ติดตามข่าวสาร
                     </a>
                 </div>
             </div>
@@ -225,68 +205,67 @@
     </section>
 
     <!-- Systems Portal Section -->
-    <section id="systems" class="py-20 relative bg-white">
+    <section id="systems" class="py-24 relative z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16 reveal">
-                <h2 class="text-3xl md:text-4xl font-prompt font-bold text-slate-900 mb-4">ระบบปฏิบัติการ <span class="text-yellow-accent">ออนไลน์</span></h2>
-                <p class="text-slate-500 max-w-2xl mx-auto">เลือกระบบที่คุณต้องการใช้งานเพื่อเข้าถึงข้อมูลหรือดำเนินการต่างๆ ระบบถูกแยกส่วนเพื่อความรวดเร็วและปลอดภัย</p>
+            <div class="text-center mb-20" data-aos="fade-up">
+                <h2 class="text-4xl md:text-5xl font-prompt font-bold text-white mb-4">ระบบปฏิบัติการ<span class="text-yellow-400">ออนไลน์</span></h2>
+                <p class="text-slate-400 max-w-2xl mx-auto text-lg">สถาปัตยกรรมแยกระบบเพื่อความปลอดภัยและความรวดเร็วสูงสุด</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Report System -->
-                <a href="/report" class="block group reveal hover-lift">
-                    <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 h-full relative overflow-hidden flex flex-col transition-colors group-hover:bg-white">
-                        <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                            <i class="fa-solid fa-bullhorn text-9xl text-red-500"></i>
+                <a href="/report" data-aos="fade-up" data-aos-delay="100" class="tilt-card block group" style="--hover-color: rgba(239, 68, 68, 0.4);">
+                    <div class="glass-card p-10 rounded-[2rem] h-full relative overflow-hidden flex flex-col transition-all duration-500 glow-hover">
+                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-red-500/10 rounded-full blur-3xl group-hover:bg-red-500/20 transition-all duration-500"></div>
+                        <div class="tilt-icon w-20 h-20 rounded-2xl bg-gradient-to-br from-red-500 to-rose-700 text-white flex items-center justify-center text-4xl mb-8 shadow-[0_0_20px_rgba(239,68,68,0.4)]">
+                            <i class="fa-solid fa-bullhorn"></i>
                         </div>
-                        <div class="w-16 h-16 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center text-2xl mb-6 shadow-sm border border-red-100">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        <div class="tilt-content flex-grow">
+                            <h3 class="text-2xl font-prompt font-bold text-white mb-4">แจ้งเหตุ (Report)</h3>
+                            <p class="text-slate-400 leading-relaxed font-light">
+                                แจ้งเหตุฉุกเฉิน ทะเลาะวิวาท หรือพฤติกรรมไม่เหมาะสมแบบเรียลไทม์ เพื่อให้สารวัตรเข้าตรวจสอบทันที
+                            </p>
                         </div>
-                        <h3 class="text-2xl font-prompt font-bold text-slate-900 mb-3">แจ้งเหตุ (Report)</h3>
-                        <p class="text-slate-600 leading-relaxed mb-8 flex-grow">
-                            ระบบสำหรับนักเรียนหรือบุคลากรทั่วไปในการแจ้งเหตุฉุกเฉิน, ทะเลาะวิวาท, หรือพฤติกรรมไม่เหมาะสม เพื่อให้สารวัตรนักเรียนเข้าตรวจสอบ
-                        </p>
-                        <div class="mt-auto flex items-center text-red-600 font-medium group-hover:translate-x-2 transition-transform">
-                            เข้าสู่ระบบแจ้งเหตุ <i class="fa-solid fa-arrow-right ml-2"></i>
+                        <div class="tilt-content mt-8 flex items-center text-red-400 font-bold group-hover:translate-x-2 transition-transform duration-300">
+                            เปิดระบบแจ้งเหตุ <i class="fa-solid fa-arrow-right ml-2"></i>
                         </div>
                     </div>
                 </a>
 
                 <!-- Complaint System -->
-                <a href="/complaint" class="block group reveal hover-lift" style="transition-delay: 100ms;">
-                    <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 h-full relative overflow-hidden flex flex-col transition-colors group-hover:bg-white">
-                        <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                            <i class="fa-solid fa-scale-balanced text-9xl text-yellow-accent"></i>
+                <a href="/complaint" data-aos="fade-up" data-aos-delay="200" class="tilt-card block group" style="--hover-color: rgba(245, 158, 11, 0.4);">
+                    <div class="glass-card p-10 rounded-[2rem] h-full relative overflow-hidden flex flex-col transition-all duration-500 glow-hover">
+                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-yellow-500/10 rounded-full blur-3xl group-hover:bg-yellow-500/20 transition-all duration-500"></div>
+                        <div class="tilt-icon w-20 h-20 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-600 text-white flex items-center justify-center text-4xl mb-8 shadow-[0_0_20px_rgba(245,158,11,0.4)]">
+                            <i class="fa-solid fa-scale-balanced"></i>
                         </div>
-                        <div class="w-16 h-16 rounded-2xl bg-yellow-50 text-yellow-600 flex items-center justify-center text-2xl mb-6 shadow-sm border border-yellow-100">
-                            <i class="fa-solid fa-comment-dots"></i>
+                        <div class="tilt-content flex-grow">
+                            <h3 class="text-2xl font-prompt font-bold text-white mb-4">ร้องเรียน (Complaint)</h3>
+                            <p class="text-slate-400 leading-relaxed font-light">
+                                ร้องเรียนการปฏิบัติหน้าที่ของสารวัตรนักเรียนเพื่อความโปร่งใส (เข้ารหัสลับขั้นสูงสุด)
+                            </p>
                         </div>
-                        <h3 class="text-2xl font-prompt font-bold text-slate-900 mb-3">ร้องเรียน (Complaint)</h3>
-                        <p class="text-slate-600 leading-relaxed mb-8 flex-grow">
-                            ระบบร้องเรียนเกี่ยวกับการปฏิบัติหน้าที่ของสารวัตรนักเรียน เพื่อความโปร่งใสและเป็นธรรมในการทำงาน (ข้อมูลจะถูกรักษาเป็นความลับ)
-                        </p>
-                        <div class="mt-auto flex items-center text-yellow-600 font-medium group-hover:translate-x-2 transition-transform">
-                            เข้าสู่ระบบร้องเรียน <i class="fa-solid fa-arrow-right ml-2"></i>
+                        <div class="tilt-content mt-8 flex items-center text-yellow-400 font-bold group-hover:translate-x-2 transition-transform duration-300">
+                            เปิดระบบร้องเรียน <i class="fa-solid fa-arrow-right ml-2"></i>
                         </div>
                     </div>
                 </a>
 
                 <!-- Duty Roster System -->
-                <a href="https://sarawatdc.site/sl-roster" class="block group reveal hover-lift" style="transition-delay: 200ms;">
-                    <div class="bg-gradient-green-yellow p-8 rounded-3xl shadow-xl shadow-green-900/20 h-full relative overflow-hidden flex flex-col text-white">
-                        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')] opacity-20"></div>
-                        <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <i class="fa-solid fa-clipboard-user text-9xl text-white"></i>
+                <a href="https://sarawatdc.site/sl-roster" data-aos="fade-up" data-aos-delay="300" class="tilt-card block group" style="--hover-color: rgba(16, 185, 129, 0.4);">
+                    <div class="bg-gradient-to-br from-green-800/80 to-emerald-900/80 backdrop-blur-xl border border-green-500/30 p-10 rounded-[2rem] h-full relative overflow-hidden flex flex-col transition-all duration-500 glow-hover">
+                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl group-hover:bg-emerald-500/40 transition-all duration-500"></div>
+                        <div class="tilt-icon w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center text-4xl mb-8 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
+                            <i class="fa-solid fa-calendar-check text-green-300"></i>
                         </div>
-                        <div class="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl mb-6 border border-white/30">
-                            <i class="fa-solid fa-calendar-check"></i>
+                        <div class="tilt-content flex-grow">
+                            <h3 class="text-2xl font-prompt font-bold text-white mb-4">ลงหน้าที่ (SI-ROASTER)</h3>
+                            <p class="text-green-100/70 leading-relaxed font-light">
+                                ระบบจำเพาะสำหรับเจ้าหน้าที่ เพื่อเลือกลงตารางเวรปฏิบัติงาน และดู Dashboard สรุปผล
+                            </p>
                         </div>
-                        <h3 class="text-2xl font-prompt font-bold mb-3">ลงหน้าที่ (SI-ROASTER)</h3>
-                        <p class="text-green-50 leading-relaxed mb-8 flex-grow relative z-10">
-                            ระบบภายในสำหรับสารวัตรนักเรียนในการเลือกลงปฏิบัติหน้าที่ตามจุดต่างๆ ตรวจสอบตารางเวร และดูสรุปรายงานแบบเรียลไทม์
-                        </p>
-                        <div class="mt-auto flex items-center text-white font-semibold group-hover:translate-x-2 transition-transform relative z-10">
-                            เข้าสู่ SI-ROASTER <i class="fa-solid fa-arrow-up-right-from-square ml-2 text-sm"></i>
+                        <div class="tilt-content mt-8 flex items-center text-white font-bold group-hover:translate-x-2 transition-transform duration-300">
+                            เข้าสู่ SI-ROASTER <i class="fa-solid fa-arrow-up-right-from-square ml-2 text-sm opacity-70"></i>
                         </div>
                     </div>
                 </a>
@@ -295,748 +274,304 @@
     </section>
 
     <!-- News Section -->
-    <section id="news" class="py-20 bg-slate-50 relative">
+    <section id="news" class="py-24 relative z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 reveal">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-16" data-aos="fade-up">
                 <div>
-                    <h2 class="text-3xl md:text-4xl font-prompt font-bold text-slate-900 mb-4"><i class="fa-regular fa-newspaper text-green-secondary mr-2"></i>ข่าวประชาสัมพันธ์</h2>
-                    <p class="text-slate-500">ติดตามข่าวสาร กิจกรรม และประกาศสำคัญจากคณะสารวัตรนักเรียน</p>
+                    <h2 class="text-4xl font-prompt font-bold text-white mb-2"><i class="fa-regular fa-newspaper text-green-400 mr-3"></i>ข่าวประชาสัมพันธ์</h2>
+                    <p class="text-slate-400 text-lg">อัปเดตความเคลื่อนไหว กิจกรรม และประกาศสำคัญ</p>
                 </div>
-                <!-- Admin Only Button -->
-                <button onclick="uiManager.openNewsModal()" class="admin-only hidden mt-4 md:mt-0 px-5 py-2.5 bg-white text-green-700 rounded-xl font-medium hover:bg-green-50 transition shadow-sm flex items-center gap-2 border border-green-200">
+                <button onclick="uiManager.openNewsModal()" class="admin-only hidden mt-6 md:mt-0 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-400 text-white rounded-full font-bold hover:scale-105 transition-transform shadow-[0_0_20px_rgba(16,185,129,0.3)] flex items-center gap-2 border border-green-400/50">
                     <i class="fa-solid fa-plus"></i> เพิ่มข่าวสาร
                 </button>
             </div>
 
-            <!-- Loading State -->
-            <div id="news-loading" class="flex flex-col items-center justify-center py-20 text-slate-400">
-                <div class="loader mb-4"></div>
-                <p>กำลังโหลดข่าวสาร...</p>
+            <!-- Loading / Empty -->
+            <div id="news-loading" class="flex flex-col items-center justify-center py-20 text-green-400">
+                <i class="fa-solid fa-circle-notch fa-spin text-5xl mb-4"></i>
+                <p class="animate-pulse">กำลังโหลดข้อมูลจากเซิร์ฟเวอร์...</p>
+            </div>
+            <div id="news-empty" class="hidden text-center py-20 glass-card rounded-[2rem] border-dashed border-2 border-slate-600">
+                <i class="fa-regular fa-folder-open text-6xl text-slate-600 mb-4"></i>
+                <h3 class="text-xl font-medium text-slate-400">ยังไม่มีข่าวประชาสัมพันธ์</h3>
             </div>
 
-            <!-- Empty State -->
-            <div id="news-empty" class="hidden text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm reveal">
-                <i class="fa-regular fa-folder-open text-5xl text-slate-300 mb-4"></i>
-                <h3 class="text-lg font-medium text-slate-600">ยังไม่มีข่าวประชาสัมพันธ์ในขณะนี้</h3>
-            </div>
-
-            <!-- News Grid (Bento Style) -->
-            <div id="news-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 hidden">
-                <!-- News cards injected here -->
-            </div>
+            <!-- News Grid -->
+            <div id="news-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 hidden"></div>
         </div>
     </section>
 
     <!-- Personnel Section -->
-    <section id="personnel" class="py-20 relative overflow-hidden bg-white">
-        <!-- Decoration -->
-        <div class="absolute -right-64 top-0 w-96 h-96 bg-green-50 rounded-full blur-3xl opacity-50 z-0"></div>
-        <div class="absolute -left-64 bottom-0 w-96 h-96 bg-yellow-50 rounded-full blur-3xl opacity-50 z-0"></div>
-
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center mb-16 reveal">
-                <h2 class="text-3xl md:text-4xl font-prompt font-bold text-slate-900 mb-4"><i class="fa-solid fa-users-viewfinder text-green-secondary mr-2"></i>ทำเนียบบุคลากร</h2>
-                <p class="text-slate-500 max-w-2xl mx-auto">คณะครูที่ปรึกษา และคณะกรรมการดำเนินงานสารวัตรนักเรียน</p>
-                <button onclick="uiManager.openPersonnelModal()" class="admin-only hidden mt-6 mx-auto px-5 py-2.5 bg-white text-green-700 rounded-xl font-medium hover:bg-green-50 transition shadow-sm flex items-center justify-center gap-2 border border-green-200">
+    <section id="personnel" class="py-24 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl font-prompt font-bold text-white mb-4"><i class="fa-solid fa-users-viewfinder text-green-400 mr-3"></i>ทำเนียบบุคลากร</h2>
+                <p class="text-slate-400 max-w-2xl mx-auto text-lg">โฉมหน้าผู้ขับเคลื่อนคณะสารวัตรนักเรียน</p>
+                <button onclick="uiManager.openPersonnelModal()" class="admin-only hidden mt-8 mx-auto px-6 py-3 bg-white/10 backdrop-blur-md text-white border border-white/20 rounded-full font-bold hover:bg-white/20 transition-colors flex items-center justify-center gap-2">
                     <i class="fa-solid fa-user-plus"></i> จัดการบุคลากร
                 </button>
             </div>
 
-            <!-- Loading State -->
-            <div id="personnel-loading" class="flex flex-col items-center justify-center py-10 text-slate-400">
-                <div class="loader mb-4"></div>
-                <p>กำลังโหลดข้อมูลบุคลากร...</p>
+            <div id="personnel-loading" class="flex flex-col items-center justify-center py-10 text-green-400">
+                <i class="fa-solid fa-circle-notch fa-spin text-5xl mb-4"></i>
             </div>
-
-            <!-- Dynamic Personnel Container -->
-            <div id="personnel-container" class="hidden flex flex-col gap-16">
-                <!-- Sections grouped by role injected here -->
-            </div>
+            <div id="personnel-container" class="hidden flex flex-col gap-20"></div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
+    <footer class="bg-black/50 backdrop-blur-xl border-t border-white/10 pt-16 pb-8 relative z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
                 <div>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 bg-green-secondary rounded-full flex items-center justify-center text-white">
-                            <i class="fa-solid fa-shield-halved text-sm"></i>
-                        </div>
-                        <h3 class="font-prompt font-bold text-white text-lg">สารวัตรนักเรียน</h3>
-                    </div>
-                    <p class="text-sm text-slate-400 leading-relaxed max-w-xs">
-                        โรงเรียนเดชะปัตตนยานุกูล<br>
-                        "สร้างระเบียบวินัย เพื่อสังคมคุณภาพ"
-                    </p>
+                    <h3 class="font-prompt font-bold text-white text-2xl mb-2">สารวัตรนักเรียน</h3>
+                    <p class="text-slate-400">โรงเรียนเดชะปัตตนยานุกูล จ.ปัตตานี</p>
                 </div>
-                <div>
-                    <h4 class="text-white font-medium mb-4 font-prompt">ระบบที่เกี่ยวข้อง</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="/report" class="hover:text-green-400 transition-colors"><i class="fa-solid fa-angle-right mr-1 text-green-secondary"></i> แจ้งเหตุออนไลน์</a></li>
-                        <li><a href="/complaint" class="hover:text-green-400 transition-colors"><i class="fa-solid fa-angle-right mr-1 text-green-secondary"></i> ร้องเรียนการปฏิบัติงาน</a></li>
-                        <li><a href="https://sarawatdc.site/sl-roster" class="hover:text-green-400 transition-colors"><i class="fa-solid fa-angle-right mr-1 text-green-secondary"></i> ระบบ SI-ROASTER</a></li>
-                        <li><a href="https://decha.ac.th" target="_blank" class="hover:text-green-400 transition-colors"><i class="fa-solid fa-angle-right mr-1 text-green-secondary"></i> เว็บไซต์โรงเรียน</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-white font-medium mb-4 font-prompt">ติดต่อเรา</h4>
-                    <ul class="space-y-3 text-sm">
-                        <li class="flex items-start gap-3">
-                            <i class="fa-solid fa-location-dot mt-1 text-green-secondary"></i>
-                            <span>ห้องสารวัตรนักเรียน โรงเรียนเดชะปัตตนยานุกูล<br>อ.เมือง จ.ปัตตานี</span>
-                        </li>
-                    </ul>
+                <div class="flex gap-6">
+                    <a href="https://decha.ac.th" target="_blank" class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-white hover:text-green-400 hover:scale-110 transition-all"><i class="fa-solid fa-globe text-xl"></i></a>
+                    <button onclick="adminManager.checkAuth()" class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-white hover:text-green-400 hover:scale-110 transition-all"><i class="fa-solid fa-lock text-xl"></i></button>
                 </div>
             </div>
-            <div class="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
-                <p>&copy; 2026 สารวัตรนักเรียน โรงเรียนเดชะปัตตนยานุกูล. All rights reserved.</p>
-                <div class="flex gap-4">
-                    <button onclick="adminManager.checkAuth()" class="hover:text-white transition-colors">เข้าสู่ระบบ (Admin)</button>
-                </div>
+            <div class="mt-12 pt-8 border-t border-white/10 text-center text-slate-600 text-sm">
+                &copy; 2026 สารวัตรนักเรียน โรงเรียนเดชะปัตตนยานุกูล. All rights reserved.
             </div>
         </div>
     </footer>
 
-    <!-- ================= MODALS ================= -->
-
     <!-- Admin Login Modal -->
-    <div id="login-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl transform scale-95 transition-transform duration-300">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-prompt font-bold text-slate-900">ผู้ดูแลระบบ</h3>
-                <button onclick="uiManager.closeModal('login-modal')" class="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 w-8 h-8 rounded-full flex items-center justify-center transition">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+    <div id="login-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-md p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-[#0f172a] border border-white/10 rounded-[2rem] w-full max-w-md p-10 shadow-[0_0_50px_rgba(0,0,0,0.5)] transform scale-95 transition-transform duration-300 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 to-yellow-400"></div>
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-prompt font-bold text-white"><i class="fa-solid fa-fingerprint text-green-400 mr-2"></i> ยืนยันตัวตน</h3>
+                <button onclick="uiManager.closeModal('login-modal')" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <form id="login-form" class="space-y-4">
+            <form id="login-form" class="space-y-5">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">อีเมล</label>
-                    <input type="email" id="login-email" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-green-secondary/50 focus:border-green-secondary transition-all bg-slate-50" placeholder="admin@sarawatdc.site">
+                    <input type="email" id="login-email" required class="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400 transition-all placeholder-slate-500" placeholder="อีเมลแอดมิน">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน</label>
-                    <input type="password" id="login-password" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-green-secondary/50 focus:border-green-secondary transition-all bg-slate-50" placeholder="••••••••">
+                    <input type="password" id="login-password" required class="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400 transition-all placeholder-slate-500" placeholder="รหัสผ่าน">
                 </div>
-                <button type="submit" id="login-submit-btn" class="w-full py-3 mt-4 rounded-xl bg-green-primary text-white font-medium hover:bg-green-secondary transition-colors flex justify-center items-center gap-2">
-                    เข้าสู่ระบบ
+                <button type="submit" id="login-submit-btn" class="w-full py-4 mt-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-500 text-white font-bold hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ
                 </button>
             </form>
-            <div id="admin-panel-actions" class="hidden flex-col gap-3">
-                <div class="p-4 bg-green-50 border border-green-100 rounded-xl mb-4 text-center">
-                    <i class="fa-solid fa-circle-check text-green-secondary text-3xl mb-2"></i>
-                    <p class="font-medium text-green-800">คุณอยู่ในระบบแล้ว</p>
-                </div>
-                <button onclick="adminManager.logout()" class="w-full py-3 rounded-xl bg-red-50 text-red-600 font-medium hover:bg-red-100 transition-colors border border-red-200">
+            <div id="admin-panel-actions" class="hidden flex-col gap-4 text-center">
+                <i class="fa-solid fa-shield-check text-6xl text-green-400 mb-2 drop-shadow-[0_0_15px_rgba(74,222,128,0.5)]"></i>
+                <p class="font-bold text-white text-lg">เข้าสู่ระบบเรียบร้อย</p>
+                <button onclick="adminManager.logout()" class="w-full py-4 rounded-xl bg-red-500/20 text-red-400 font-bold hover:bg-red-500/30 transition-all border border-red-500/30 mt-4">
                     ออกจากระบบ
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- News Edit/Add Modal -->
-    <div id="news-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-8 shadow-2xl transform scale-95 transition-transform duration-300">
-            <div class="flex justify-between items-center mb-6">
-                <h3 id="news-modal-title" class="text-2xl font-prompt font-bold text-slate-900">เพิ่มข่าวประชาสัมพันธ์</h3>
-                <button onclick="uiManager.closeModal('news-modal')" class="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 w-8 h-8 rounded-full flex items-center justify-center transition">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <form id="news-form" class="space-y-4">
-                <input type="hidden" id="news-id">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">หัวข้อข่าว</label>
-                    <input type="text" id="news-title" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-green-secondary/50 focus:border-green-secondary bg-slate-50">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">เนื้อหาแบบย่อ</label>
-                    <textarea id="news-summary" rows="3" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-green-secondary/50 focus:border-green-secondary bg-slate-50"></textarea>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">ลิงก์ภาพประกอบ (URL)</label>
-                    <input type="url" id="news-image" placeholder="https://..." class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-green-secondary/50 focus:border-green-secondary bg-slate-50">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">ลิงก์อ่านเพิ่มเติม (URL)</label>
-                    <input type="url" id="news-link" placeholder="https://..." class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-green-secondary/50 focus:border-green-secondary bg-slate-50">
-                </div>
-                <div class="pt-4 flex gap-3">
-                    <button type="button" onclick="uiManager.closeModal('news-modal')" class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 font-medium hover:bg-slate-200 transition-colors">ยกเลิก</button>
-                    <button type="submit" id="news-submit-btn" class="flex-1 py-3 rounded-xl bg-green-primary text-white font-medium hover:bg-green-secondary transition-colors">บันทึก</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
 
-    <!-- Personnel Edit/Add Modal -->
-    <div id="personnel-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-8 shadow-2xl transform scale-95 transition-transform duration-300">
-            <div class="flex justify-between items-center mb-6">
-                <h3 id="personnel-modal-title" class="text-2xl font-prompt font-bold text-slate-900">เพิ่มบุคลากร</h3>
-                <button onclick="uiManager.closeModal('personnel-modal')" class="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 w-8 h-8 rounded-full flex items-center justify-center transition">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <form id="personnel-form" class="space-y-4">
-                <input type="hidden" id="personnel-id">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อ-นามสกุล</label>
-                    <input type="text" id="personnel-name" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-green-secondary/50 focus:border-green-secondary bg-slate-50">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">ตำแหน่ง</label>
-                    <input type="text" id="personnel-position" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-green-secondary/50 focus:border-green-secondary bg-slate-50" placeholder="เช่น ประธานสารวัตร, ครูที่ปรึกษา">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">กลุ่ม/ฝ่าย (หมวดหมู่)</label>
-                    <select id="personnel-group" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-green-secondary/50 focus:border-green-secondary bg-slate-50">
-                        <option value="advisor">คณะครูที่ปรึกษา</option>
-                        <option value="executive">คณะกรรมการบริหาร</option>
-                        <option value="member">สมาชิกสารวัตรนักเรียน</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">ลำดับการแสดงผล (เลขน้อยขึ้นก่อน)</label>
-                    <input type="number" id="personnel-order" required value="99" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-green-secondary/50 focus:border-green-secondary bg-slate-50">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">ลิงก์รูปภาพ (URL)</label>
-                    <input type="url" id="personnel-image" placeholder="https://..." class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-green-secondary/50 focus:border-green-secondary bg-slate-50">
-                </div>
-                <div class="pt-4 flex gap-3">
-                    <button type="button" onclick="uiManager.closeModal('personnel-modal')" class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 font-medium hover:bg-slate-200 transition-colors">ยกเลิก</button>
-                    <button type="submit" id="personnel-submit-btn" class="flex-1 py-3 rounded-xl bg-green-primary text-white font-medium hover:bg-green-secondary transition-colors">บันทึก</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-
-    <!-- ================= SCRIPTS ================= -->
     <script type="module">
-        // Firebase Setup (Modular SDK v11.6.1)
+        AOS.init({ once: true, offset: 50 });
+        VanillaTilt.init(document.querySelectorAll(".tilt-card"), { max: 5, speed: 400, glare: true, "max-glare": 0.2 });
+
+        // Firebase v11 Setup with User's Real Config
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // IMPORTANT: Replace with actual Firebase Config
         const firebaseConfig = {
-            apiKey: "AIzaSyDummyKeyReplaceWithActual",
+            apiKey: "AIzaSyBTHk57HCEZgn8ydldHjOaFxVgy1Xtlpk8",
             authDomain: "sarawatdc.firebaseapp.com",
             projectId: "sarawatdc",
-            storageBucket: "sarawatdc.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:abcdef123456"
+            storageBucket: "sarawatdc.firebasestorage.app",
+            messagingSenderId: "403581597525",
+            appId: "1:403581597525:web:6fd3f19a881a0ca42661dc",
+            measurementId: "G-E7TQXXE7W8"
         };
 
-        let app, auth, db;
-        
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            console.log("Firebase initialized");
-        } catch (e) {
-            console.warn("Firebase config is missing or invalid. App will run in UI-only mode for demonstration.", e);
-        }
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // Global State
-        window.appState = {
-            isAdmin: false,
-            newsList: [],
-            personnelList: []
-        };
+        window.appState = { isAdmin: false, newsList: [], personnelList: [] };
 
-        // --- Data Managers ---
-        
+        // Data Management logic remains similar but styled for Dark Mode
         const dataManager = {
             async loadNews() {
-                const grid = document.getElementById('news-grid');
-                const loading = document.getElementById('news-loading');
-                const empty = document.getElementById('news-empty');
-                
-                if (!db) { this.renderMockNews(); return; }
-
                 try {
                     const q = query(collection(db, "news"), orderBy("createdAt", "desc"));
                     const querySnapshot = await getDocs(q);
                     window.appState.newsList = [];
-                    querySnapshot.forEach((doc) => {
-                        window.appState.newsList.push({ id: doc.id, ...doc.data() });
-                    });
-                    
+                    querySnapshot.forEach((doc) => window.appState.newsList.push({ id: doc.id, ...doc.data() }));
                     this.renderNews();
                 } catch (error) {
-                    console.error("Error loading news:", error);
-                    loading.classList.add('hidden');
-                    grid.innerHTML = '<div class="col-span-full text-center text-red-500 py-10">ไม่สามารถเชื่อมต่อฐานข้อมูลได้ โปรดตรวจสอบการตั้งค่า Firebase</div>';
-                    grid.classList.remove('hidden');
+                    document.getElementById('news-loading').classList.add('hidden');
+                    document.getElementById('news-grid').innerHTML = `<div class="col-span-full text-center text-red-400 py-10 bg-red-900/20 rounded-2xl border border-red-500/30">เชื่อมต่อฐานข้อมูลล้มเหลว: ${error.message}</div>`;
+                    document.getElementById('news-grid').classList.remove('hidden');
                 }
             },
-
-            renderMockNews() {
-                window.appState.newsList = [
-                    { id: '1', title: 'ประกาศเปิดรับสมัครสารวัตรนักเรียน ปี 2570', summary: 'ขอเชิญชวนนักเรียนที่มีจิตอาสา สมัครเข้าร่วมเป็นส่วนหนึ่งของคณะสารวัตรนักเรียน', imageUrl: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&q=80&w=800', createdAt: new Date() },
-                    { id: '2', title: 'สรุปผลการปฏิบัติงานประจำเดือนพฤศจิกายน', summary: 'รายงานผลการตรวจความเรียบร้อยและกิจกรรมที่จัดขึ้นในรอบเดือนที่ผ่านมา', imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=800', createdAt: new Date(Date.now() - 86400000) },
-                    { id: '3', title: 'กิจกรรมจิตอาสาพัฒนาโรงเรียน', summary: 'สารวัตรนักเรียนร่วมกับสภานักเรียนทำกิจกรรมทำความสะอาดบริเวณรอบโรงเรียน', imageUrl: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&q=80&w=800', createdAt: new Date(Date.now() - 172800000) }
-                ];
-                this.renderNews();
-            },
-
             renderNews() {
                 const grid = document.getElementById('news-grid');
-                const loading = document.getElementById('news-loading');
-                const empty = document.getElementById('news-empty');
-                
-                loading.classList.add('hidden');
+                document.getElementById('news-loading').classList.add('hidden');
                 
                 if (window.appState.newsList.length === 0) {
-                    empty.classList.remove('hidden');
+                    document.getElementById('news-empty').classList.remove('hidden');
                     grid.classList.add('hidden');
                     return;
                 }
                 
-                empty.classList.add('hidden');
+                document.getElementById('news-empty').classList.add('hidden');
                 grid.classList.remove('hidden');
                 grid.innerHTML = '';
                 
                 window.appState.newsList.forEach((news, idx) => {
-                    const dateStr = news.createdAt && news.createdAt.toDate ? news.createdAt.toDate().toLocaleDateString('th-TH') : (news.createdAt instanceof Date ? news.createdAt.toLocaleDateString('th-TH') : new Date().toLocaleDateString('th-TH'));
-                    
+                    const dateStr = news.createdAt?.toDate ? news.createdAt.toDate().toLocaleDateString('th-TH') : new Date().toLocaleDateString('th-TH');
                     const adminTools = window.appState.isAdmin ? `
                         <div class="absolute top-4 right-4 flex gap-2 z-20">
-                            <button onclick="uiManager.openNewsModal('${news.id}')" class="w-8 h-8 bg-white/90 backdrop-blur rounded-full text-yellow-600 hover:bg-yellow-50 shadow-sm flex items-center justify-center transition"><i class="fa-solid fa-pen text-sm"></i></button>
-                            <button onclick="dataManager.deleteNews('${news.id}')" class="w-8 h-8 bg-white/90 backdrop-blur rounded-full text-red-600 hover:bg-red-50 shadow-sm flex items-center justify-center transition"><i class="fa-solid fa-trash text-sm"></i></button>
+                            <button onclick="dataManager.deleteNews('${news.id}')" class="w-10 h-10 bg-red-500/80 backdrop-blur-md rounded-full text-white hover:bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)] flex items-center justify-center transition"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     ` : '';
 
-                    const imgUrl = news.imageUrl || 'https://via.placeholder.com/600x400?text=ไม่มีรูปภาพ';
+                    const imgUrl = news.imageUrl || 'https://via.placeholder.com/600x400/0f172a/34d399?text=NO+IMAGE';
                     
-                    const card = `
-                        <div class="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-xl shadow-slate-200/50 hover-lift group relative reveal" style="transition-delay: ${idx * 50}ms">
+                    grid.insertAdjacentHTML('beforeend', `
+                        <div data-aos="fade-up" data-aos-delay="${idx * 100}" class="glass-card rounded-[2rem] overflow-hidden group hover:-translate-y-2 transition-all duration-500 hover:shadow-[0_15px_40px_rgba(16,185,129,0.15)] border-white/5">
                             ${adminTools}
-                            <div class="h-48 overflow-hidden relative">
-                                <img src="${imgUrl}" alt="${news.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-60"></div>
-                                <div class="absolute bottom-4 left-4 text-white text-sm font-medium bg-black/30 backdrop-blur-md px-3 py-1 rounded-full border border-white/20">
-                                    <i class="fa-regular fa-calendar mr-1"></i> ${dateStr}
+                            <div class="h-56 overflow-hidden relative">
+                                <img src="${imgUrl}" alt="${news.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1">
+                                <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent opacity-90"></div>
+                                <div class="absolute bottom-4 left-5 text-green-300 text-sm font-bold bg-green-900/50 backdrop-blur-md px-4 py-1.5 rounded-full border border-green-500/30">
+                                    <i class="fa-regular fa-calendar mr-2"></i> ${dateStr}
                                 </div>
                             </div>
-                            <div class="p-6 flex flex-col h-[calc(100%-12rem)]">
-                                <h3 class="font-prompt font-bold text-lg text-slate-900 mb-2 line-clamp-2">${news.title}</h3>
-                                <p class="text-slate-600 text-sm mb-6 line-clamp-3 flex-grow">${news.summary}</p>
-                                ${news.linkUrl ? `<a href="${news.linkUrl}" target="_blank" class="mt-auto inline-flex items-center text-green-secondary font-medium hover:text-green-primary transition-colors">อ่านเพิ่มเติม <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></a>` : ''}
+                            <div class="p-8">
+                                <h3 class="font-prompt font-bold text-xl text-white mb-3 line-clamp-2">${news.title}</h3>
+                                <p class="text-slate-400 text-sm mb-6 line-clamp-3">${news.summary}</p>
+                                ${news.linkUrl ? `<a href="${news.linkUrl}" target="_blank" class="inline-flex items-center text-yellow-400 font-bold hover:text-yellow-300 transition-colors">อ่านรายละเอียด <i class="fa-solid fa-arrow-right ml-2 text-sm"></i></a>` : ''}
                             </div>
                         </div>
-                    `;
-                    grid.insertAdjacentHTML('beforeend', card);
+                    `);
                 });
-                
-                setTimeout(uiManager.handleScrollReveal, 50);
             },
-
             async deleteNews(id) {
-                if(!db) return;
-                const result = await Swal.fire({
-                    title: 'ยืนยันการลบ?',
-                    text: "คุณไม่สามารถกู้คืนข่าวนี้ได้!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'ลบข้อมูล',
-                    cancelButtonText: 'ยกเลิก'
-                });
-                
+                const result = await Swal.fire({ title: 'ลบข่าวนี้?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', background: '#0f172a', color: '#fff' });
                 if (result.isConfirmed) {
-                    try {
-                        await deleteDoc(doc(db, "news", id));
-                        Swal.fire('ลบสำเร็จ!', 'ข่าวถูกลบออกจากระบบแล้ว.', 'success');
-                        this.loadNews();
-                    } catch (error) {
-                        Swal.fire('เกิดข้อผิดพลาด', error.message, 'error');
-                    }
+                    await deleteDoc(doc(db, "news", id));
+                    Swal.fire({title:'ลบสำเร็จ', icon:'success', background: '#0f172a', color: '#fff'});
+                    this.loadNews();
                 }
             },
-
             async loadPersonnel() {
-                const container = document.getElementById('personnel-container');
-                const loading = document.getElementById('personnel-loading');
-                
-                if (!db) { this.renderMockPersonnel(); return; }
-
                 try {
                     const q = query(collection(db, "personnel"), orderBy("order", "asc"));
                     const querySnapshot = await getDocs(q);
                     window.appState.personnelList = [];
-                    querySnapshot.forEach((doc) => {
-                        window.appState.personnelList.push({ id: doc.id, ...doc.data() });
-                    });
-                    
+                    querySnapshot.forEach((doc) => window.appState.personnelList.push({ id: doc.id, ...doc.data() }));
                     this.renderPersonnel();
-                } catch (error) {
-                    loading.classList.add('hidden');
-                    container.innerHTML = '<div class="text-center text-red-500 py-10">ไม่สามารถเชื่อมต่อฐานข้อมูลบุคลากรได้</div>';
-                    container.classList.remove('hidden');
+                } catch(error) {
+                    document.getElementById('personnel-loading').classList.add('hidden');
                 }
             },
-
-            renderMockPersonnel() {
-                window.appState.personnelList = [
-                    { id: '1', name: 'นายจีรฏะ วิเชียรรัตน์', position: 'ที่ปรึกษาสารวัตรนักเรียน', group: 'advisor', order: 1 },
-                    { id: '2', name: 'นายประธาน สมมติ', position: 'ประธานสารวัตรนักเรียน', group: 'executive', order: 2 },
-                    { id: '3', name: 'นางสาวรองประธาน ทดสอบ', position: 'รองประธานสารวัตรนักเรียน', group: 'executive', order: 3 },
-                    { id: '4', name: 'นายสารวัตร เข้มแข็ง', position: 'สารวัตรนักเรียน', group: 'member', order: 4 }
-                ];
-                this.renderPersonnel();
-            },
-
             renderPersonnel() {
                 const container = document.getElementById('personnel-container');
-                const loading = document.getElementById('personnel-loading');
-                
-                loading.classList.add('hidden');
+                document.getElementById('personnel-loading').classList.add('hidden');
                 container.classList.remove('hidden');
                 container.innerHTML = '';
 
-                const groups = [
-                    { id: 'advisor', title: 'คณะครูที่ปรึกษา' },
-                    { id: 'executive', title: 'คณะกรรมการบริหาร' },
-                    { id: 'member', title: 'สมาชิกสารวัตรนักเรียน' }
-                ];
-
-                groups.forEach(group => {
+                const groups = [{ id: 'advisor', title: 'คณะครูที่ปรึกษา' }, { id: 'executive', title: 'คณะกรรมการบริหาร' }, { id: 'member', title: 'สมาชิกสารวัตรนักเรียน' }];
+                
+                groups.forEach((group, gIdx) => {
                     const members = window.appState.personnelList.filter(p => p.group === group.id);
                     if (members.length === 0) return;
 
-                    let html = `
-                        <div class="reveal">
-                            <h3 class="text-2xl font-prompt font-bold text-slate-800 mb-8 text-center border-b-2 border-green-secondary/20 inline-block mx-auto pb-2 px-8">${group.title}</h3>
-                            <div class="flex flex-wrap justify-center gap-6 md:gap-8">
-                    `;
+                    let html = `<div data-aos="fade-up"><h3 class="text-3xl font-prompt font-bold text-white mb-10 text-center"><span class="bg-gradient-to-r from-transparent via-green-900/50 to-transparent px-10 py-2 border-b-2 border-green-500">${group.title}</span></h3><div class="flex flex-wrap justify-center gap-8">`;
 
-                    members.forEach((person) => {
+                    members.forEach((person, idx) => {
                         const imgUrl = person.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(person.name)}&background=064e3b&color=fff&size=200`;
-                        
-                        const adminTools = window.appState.isAdmin ? `
-                            <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                                <button onclick="uiManager.openPersonnelModal('${person.id}')" class="w-8 h-8 bg-white/90 rounded-full text-yellow-600 hover:bg-yellow-50 shadow-md flex items-center justify-center"><i class="fa-solid fa-pen text-xs"></i></button>
-                                <button onclick="dataManager.deletePersonnel('${person.id}')" class="w-8 h-8 bg-white/90 rounded-full text-red-600 hover:bg-red-50 shadow-md flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>
-                            </div>
-                        ` : '';
+                        const adminTools = window.appState.isAdmin ? `<button onclick="dataManager.deletePersonnel('${person.id}')" class="absolute top-4 right-4 w-8 h-8 bg-red-500/80 rounded-full text-white hover:bg-red-500 flex items-center justify-center z-20"><i class="fa-solid fa-trash text-xs"></i></button>` : '';
 
                         html += `
-                            <div class="w-full sm:w-64 bg-white rounded-3xl p-6 flex flex-col items-center text-center shadow-lg shadow-slate-200/50 border border-slate-100 group relative hover-lift transition-all">
+                            <div data-aos="zoom-in" data-aos-delay="${idx * 50}" class="w-full sm:w-64 glass-card rounded-[2rem] p-8 flex flex-col items-center text-center group hover:-translate-y-3 transition-transform duration-500 relative">
                                 ${adminTools}
-                                <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-slate-50 shadow-inner mb-5 relative group-hover:border-green-100 transition-colors">
-                                    <img src="${imgUrl}" alt="${person.name}" class="w-full h-full object-cover">
+                                <div class="w-36 h-36 rounded-full overflow-hidden border-4 border-green-500/30 mb-6 relative group-hover:border-green-400 group-hover:shadow-[0_0_20px_rgba(74,222,128,0.4)] transition-all duration-300 p-1">
+                                    <img src="${imgUrl}" class="w-full h-full object-cover rounded-full">
                                 </div>
-                                <h4 class="font-prompt font-bold text-lg text-slate-900 mb-1">${person.name}</h4>
-                                <p class="text-sm font-medium text-green-secondary bg-green-50 px-3 py-1 rounded-full">${person.position}</p>
+                                <h4 class="font-prompt font-bold text-xl text-white mb-2">${person.name}</h4>
+                                <p class="text-sm font-bold text-green-400 bg-green-900/30 px-4 py-1.5 rounded-full border border-green-500/20">${person.position}</p>
                             </div>
                         `;
                     });
-
                     html += `</div></div>`;
                     container.insertAdjacentHTML('beforeend', html);
                 });
-                
-                setTimeout(uiManager.handleScrollReveal, 50);
             },
-
             async deletePersonnel(id) {
-                if(!db) return;
-                const result = await Swal.fire({
-                    title: 'ยืนยันการลบ?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'ลบ',
-                    cancelButtonText: 'ยกเลิก'
-                });
-                
-                if (result.isConfirmed) {
-                    try {
-                        await deleteDoc(doc(db, "personnel", id));
-                        Swal.fire('ลบสำเร็จ!', '', 'success');
-                        this.loadPersonnel();
-                    } catch (error) {
-                        Swal.fire('เกิดข้อผิดพลาด', error.message, 'error');
-                    }
-                }
+                const result = await Swal.fire({ title: 'ลบบุคลากร?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', background: '#0f172a', color: '#fff' });
+                if (result.isConfirmed) { await deleteDoc(doc(db, "personnel", id)); this.loadPersonnel(); }
             }
         };
 
-        // --- Admin Manager ---
-        
         const adminManager = {
             init() {
-                if(!auth) return;
                 onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        window.appState.isAdmin = true;
-                        this.updateUIForAdmin();
+                    window.appState.isAdmin = !!user;
+                    if(user) {
+                        document.getElementById('admin-status-text').textContent = 'Admin Mode';
+                        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
                     } else {
-                        window.appState.isAdmin = false;
-                        this.updateUIForUser();
+                        document.getElementById('admin-status-text').textContent = 'ผู้ดูแลระบบ';
+                        document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
                     }
-                    dataManager.renderNews();
-                    dataManager.renderPersonnel();
+                    dataManager.renderNews(); dataManager.renderPersonnel();
                 });
 
                 document.getElementById('login-form').addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    if(!auth) { Swal.fire('Error', 'Firebase Auth not initialized', 'error'); return; }
-                    const email = document.getElementById('login-email').value;
-                    const pwd = document.getElementById('login-password').value;
                     const btn = document.getElementById('login-submit-btn');
-                    
-                    btn.disabled = true;
-                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังตรวจสอบ...';
-                    
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
                     try {
-                        await signInWithEmailAndPassword(auth, email, pwd);
+                        await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value);
                         uiManager.closeModal('login-modal');
-                        Swal.fire({ icon: 'success', title: 'เข้าสู่ระบบสำเร็จ', timer: 1500, showConfirmButton: false });
                     } catch (error) {
-                        Swal.fire('เข้าสู่ระบบล้มเหลว', 'อีเมลหรือรหัสผ่านไม่ถูกต้อง', 'error');
-                    } finally {
-                        btn.disabled = false;
-                        btn.innerHTML = 'เข้าสู่ระบบ';
-                    }
+                        Swal.fire({title: 'ล้มเหลว', text: 'ข้อมูลไม่ถูกต้อง', icon: 'error', background: '#0f172a', color: '#fff'});
+                    } finally { btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ'; }
                 });
             },
-
             checkAuth() {
                 if (window.appState.isAdmin) {
                     document.getElementById('login-form').classList.add('hidden');
                     document.getElementById('admin-panel-actions').classList.remove('hidden');
-                    uiManager.openModal('login-modal');
                 } else {
                     document.getElementById('login-form').classList.remove('hidden');
                     document.getElementById('admin-panel-actions').classList.add('hidden');
-                    document.getElementById('login-email').value = '';
-                    document.getElementById('login-password').value = '';
-                    uiManager.openModal('login-modal');
                 }
+                uiManager.openModal('login-modal');
             },
-
-            logout() {
-                if(!auth) return;
-                signOut(auth).then(() => {
-                    uiManager.closeModal('login-modal');
-                    Swal.fire({ icon: 'info', title: 'ออกจากระบบแล้ว', timer: 1500, showConfirmButton: false });
-                });
-            },
-
-            updateUIForAdmin() {
-                document.getElementById('admin-status-text').textContent = 'Admin Mode';
-                document.getElementById('admin-status-text').parentElement.classList.add('bg-green-100', 'text-green-700', 'border', 'border-green-200');
-                document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
-            },
-
-            updateUIForUser() {
-                document.getElementById('admin-status-text').textContent = 'ผู้ดูแลระบบ';
-                document.getElementById('admin-status-text').parentElement.classList.remove('bg-green-100', 'text-green-700', 'border', 'border-green-200');
-                document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
-            }
+            logout() { signOut(auth).then(() => uiManager.closeModal('login-modal')); }
         };
 
-        // --- UI & Interaction Manager ---
-        
         const uiManager = {
             init() {
-                // Navbar scroll effect
-                window.addEventListener('scroll', () => {
-                    const nav = document.getElementById('navbar').querySelector('.glass-nav');
-                    if (window.scrollY > 20) {
-                        nav.classList.add('shadow-lg', 'bg-white/95');
-                        nav.classList.remove('bg-white/85');
-                    } else {
-                        nav.classList.remove('shadow-lg', 'bg-white/95');
-                        nav.classList.add('bg-white/85');
-                    }
-                    this.handleScrollReveal();
-                });
-
-                // Mobile menu
-                const mobileBtn = document.getElementById('mobile-menu-btn');
-                const mobileMenu = document.getElementById('mobile-menu');
-                mobileBtn.addEventListener('click', () => {
-                    if (mobileMenu.classList.contains('hidden')) {
-                        mobileMenu.classList.remove('hidden');
-                        setTimeout(() => mobileMenu.classList.remove('opacity-0'), 10);
-                    } else {
-                        mobileMenu.classList.add('opacity-0');
-                        setTimeout(() => mobileMenu.classList.add('hidden'), 300);
-                    }
-                });
-                
-                document.querySelectorAll('.mobile-link').forEach(link => {
-                    link.addEventListener('click', () => {
-                        mobileMenu.classList.add('opacity-0');
-                        setTimeout(() => mobileMenu.classList.add('hidden'), 300);
-                    });
-                });
-
-                // Form handlers
-                document.getElementById('news-form').addEventListener('submit', this.handleNewsSubmit.bind(this));
-                document.getElementById('personnel-form').addEventListener('submit', this.handlePersonnelSubmit.bind(this));
-                
-                // Initial Reveal
-                setTimeout(this.handleScrollReveal, 100);
-            },
-
-            handleScrollReveal() {
-                const reveals = document.querySelectorAll('.reveal');
-                const windowHeight = window.innerHeight;
-                reveals.forEach(el => {
-                    const elementTop = el.getBoundingClientRect().top;
-                    const elementVisible = 50;
-                    if (elementTop < windowHeight - elementVisible) {
-                        el.classList.add('active');
-                    }
+                document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                    const m = document.getElementById('mobile-menu');
+                    m.classList.toggle('hidden'); setTimeout(() => m.classList.toggle('opacity-0'), 10);
                 });
             },
-
-            openModal(modalId) {
-                const modal = document.getElementById(modalId);
-                const content = modal.querySelector('div');
-                modal.classList.remove('hidden');
-                void modal.offsetWidth; // Trigger reflow
-                modal.classList.remove('opacity-0');
-                content.classList.remove('scale-95');
+            openModal(id) {
+                const m = document.getElementById(id);
+                m.classList.remove('hidden'); void m.offsetWidth;
+                m.classList.remove('opacity-0'); m.querySelector('div').classList.remove('scale-95');
             },
-
-            closeModal(modalId) {
-                const modal = document.getElementById(modalId);
-                const content = modal.querySelector('div');
-                modal.classList.add('opacity-0');
-                content.classList.add('scale-95');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                }, 300);
-            },
-
-            openNewsModal(id = null) {
-                document.getElementById('news-form').reset();
-                const title = document.getElementById('news-modal-title');
-                const idInput = document.getElementById('news-id');
-                
-                if (id) {
-                    title.textContent = 'แก้ไขข่าวประชาสัมพันธ์';
-                    const news = window.appState.newsList.find(n => n.id === id);
-                    if (news) {
-                        idInput.value = news.id;
-                        document.getElementById('news-title').value = news.title;
-                        document.getElementById('news-summary').value = news.summary;
-                        document.getElementById('news-image').value = news.imageUrl || '';
-                        document.getElementById('news-link').value = news.linkUrl || '';
-                    }
-                } else {
-                    title.textContent = 'เพิ่มข่าวประชาสัมพันธ์';
-                    idInput.value = '';
-                }
-                this.openModal('news-modal');
-            },
-
-            async handleNewsSubmit(e) {
-                e.preventDefault();
-                if(!db) { Swal.fire('Error', 'DB not connected', 'error'); return; }
-                
-                const btn = document.getElementById('news-submit-btn');
-                btn.disabled = true;
-                btn.innerHTML = 'กำลังบันทึก...';
-                
-                const id = document.getElementById('news-id').value;
-                const data = {
-                    title: document.getElementById('news-title').value,
-                    summary: document.getElementById('news-summary').value,
-                    imageUrl: document.getElementById('news-image').value,
-                    linkUrl: document.getElementById('news-link').value
-                };
-
-                try {
-                    if (id) {
-                        await updateDoc(doc(db, "news", id), data);
-                    } else {
-                        data.createdAt = serverTimestamp();
-                        await addDoc(collection(db, "news"), data);
-                    }
-                    this.closeModal('news-modal');
-                    Swal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อย', 'success');
-                    dataManager.loadNews();
-                } catch (error) {
-                    Swal.fire('ข้อผิดพลาด', error.message, 'error');
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = 'บันทึก';
-                }
-            },
-
-            openPersonnelModal(id = null) {
-                document.getElementById('personnel-form').reset();
-                const title = document.getElementById('personnel-modal-title');
-                const idInput = document.getElementById('personnel-id');
-                
-                if (id) {
-                    title.textContent = 'แก้ไขบุคลากร';
-                    const p = window.appState.personnelList.find(n => n.id === id);
-                    if (p) {
-                        idInput.value = p.id;
-                        document.getElementById('personnel-name').value = p.name;
-                        document.getElementById('personnel-position').value = p.position;
-                        document.getElementById('personnel-group').value = p.group;
-                        document.getElementById('personnel-order').value = p.order;
-                        document.getElementById('personnel-image').value = p.imageUrl || '';
-                    }
-                } else {
-                    title.textContent = 'เพิ่มบุคลากร';
-                    idInput.value = '';
-                    document.getElementById('personnel-order').value = '99';
-                }
-                this.openModal('personnel-modal');
-            },
-
-            async handlePersonnelSubmit(e) {
-                e.preventDefault();
-                if(!db) { Swal.fire('Error', 'DB not connected', 'error'); return; }
-                
-                const btn = document.getElementById('personnel-submit-btn');
-                btn.disabled = true;
-                btn.innerHTML = 'กำลังบันทึก...';
-                
-                const id = document.getElementById('personnel-id').value;
-                const data = {
-                    name: document.getElementById('personnel-name').value,
-                    position: document.getElementById('personnel-position').value,
-                    group: document.getElementById('personnel-group').value,
-                    order: parseInt(document.getElementById('personnel-order').value) || 99,
-                    imageUrl: document.getElementById('personnel-image').value
-                };
-
-                try {
-                    if (id) {
-                        await updateDoc(doc(db, "personnel", id), data);
-                    } else {
-                        await addDoc(collection(db, "personnel"), data);
-                    }
-                    this.closeModal('personnel-modal');
-                    Swal.fire('สำเร็จ', 'บันทึกข้อมูลบุคลากรเรียบร้อย', 'success');
-                    dataManager.loadPersonnel();
-                } catch (error) {
-                    Swal.fire('ข้อผิดพลาด', error.message, 'error');
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = 'บันทึก';
-                }
+            closeModal(id) {
+                const m = document.getElementById(id);
+                m.classList.add('opacity-0'); m.querySelector('div').classList.add('scale-95');
+                setTimeout(() => m.classList.add('hidden'), 300);
             }
         };
 
-        // --- App Boot ---
         window.uiManager = uiManager;
         window.dataManager = dataManager;
         window.adminManager = adminManager;
@@ -1045,7 +580,6 @@
         uiManager.init();
         dataManager.loadNews();
         dataManager.loadPersonnel();
-
     </script>
 </body>
 </html>
