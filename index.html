@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สารวัตรนักเรียน | โรงเรียนเดชะปัตตนยานุกูล</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Kanit', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        decha: {
+                            primary: '#064E3B',    // Dark Green
+                            secondary: '#FBBF24',  // Golden Yellow
+                            light: '#ECFDF5',      // Mint Light
+                            dark: '#022C22',       // Deepest Green
+                            accent: '#10B981',     // Emerald
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'blob': 'blob 7s infinite',
+                        'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: 0, transform: 'translateY(30px)' },
+                            '100%': { opacity: 1, transform: 'translateY(0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F8FAFC;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(160, 100%, 96%, 1) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(43, 100%, 94%, 1) 0px, transparent 50%);
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+
+        /* Premium Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: theme('colors.decha.primary'); border-radius: 10px; }
+
+        /* Glassmorphism Classes */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px 0 rgba(6, 78, 59, 0.05);
+            border-radius: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            box-shadow: 0 15px 40px rgba(6, 78, 59, 0.1);
+            transform: translateY(-5px);
+        }
+
+        /* Bento Grid Specific */
+        .bento-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1.5rem;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .bento-item:hover {
+            border-color: theme('colors.decha.secondary');
+            box-shadow: 0 20px 40px rgba(6, 78, 59, 0.15);
+            transform: translateY(-8px);
+        }
+
+        /* Inputs */
+        .input-premium {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(6, 78, 59, 0.1);
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+            color: theme('colors.slate.800');
+        }
+        .input-premium:focus {
+            outline: none;
+            border-color: theme('colors.decha.secondary');
+            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.2);
+            background: #fff;
+        }
+
+        /* Page View Routing */
+        .page-view {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .page-view.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Animation utilities */
+        .stagger-1 { animation-delay: 100ms; }
+        .stagger-2 { animation-delay: 200ms; }
+        .stagger-3 { animation-delay: 300ms; }
+
+        /* SweetAlert Customization */
+        div:where(.swal2-container) { font-family: 'Kanit', sans-serif !important; backdrop-filter: blur(5px); }
+        div:where(.swal2-popup) { border-radius: 1.5rem !important; padding: 2rem !important; }
+        button:where(.swal2-confirm) { background-color: theme('colors.decha.primary') !important; border-radius: 999px !important; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-800">
+
+    <nav class="glass-nav fixed w-full top-0 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <a href="#/home" class="flex items-center gap-4 group">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-decha-primary to-decha-dark flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
+                        <i class="fa-solid fa-shield-halved text-decha-secondary text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-decha-primary leading-none">สารวัตรนักเรียน</h1>
+                        <span class="text-[0.7rem] font-semibold text-slate-500 uppercase tracking-widest">เดชะปัตตนยานุกูล</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Nav -->
+                <div class="hidden lg:flex items-center space-x-1 bg-slate-100/50 p-1.5 rounded-full border border-slate-200/50 backdrop-blur-sm">
+                    <a href="#/home" class="nav-link px-5 py-2 rounded-full font-medium text-slate-600 hover:text-decha-primary hover:bg-white transition-all">หน้าหลัก</a>
+                    <a href="#/report" class="nav-link px-5 py-2 rounded-full font-medium text-slate-600 hover:text-decha-primary hover:bg-white transition-all">แจ้งเหตุทั่วไป</a>
+                    <a href="#/complaint" class="nav-link px-5 py-2 rounded-full font-medium text-slate-600 hover:text-decha-primary hover:bg-white transition-all">ร้องเรียนสารวัตรฯ</a>
+                </div>
+
+                <!-- Right Actions -->
+                <div class="hidden lg:flex items-center gap-3">
+                    <a href="https://sarawatdc.site/sl-roster" target="_blank" class="px-5 py-2.5 rounded-full font-bold bg-decha-primary text-white shadow-md hover:shadow-lg hover:-translate-y-1 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-check text-decha-secondary"></i> SI-ROASTER
+                    </a>
+                    <button onclick="checkAdminLogin()" class="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-decha-primary hover:bg-decha-light transition-all" title="ระบบหลังบ้าน">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="lg:hidden text-slate-600 text-2xl p-2" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenu" class="fixed inset-0 z-40 bg-slate-900/95 backdrop-blur-xl hidden flex flex-col justify-center items-center">
+        <button onclick="document.getElementById('mobileMenu').classList.add('hidden')" class="absolute top-6 right-6 text-white/50 hover:text-white text-3xl"><i class="fa-solid fa-xmark"></i></button>
+        <div class="flex flex-col gap-6 text-center w-full px-8">
+            <a href="#/home" onclick="document.getElementById('mobileMenu').classList.add('hidden')" class="text-2xl font-bold text-white hover:text-decha-secondary transition">หน้าหลัก</a>
+            <a href="#/report" onclick="document.getElementById('mobileMenu').classList.add('hidden')" class="text-2xl font-bold text-white hover:text-decha-secondary transition">แจ้งเหตุทั่วไป</a>
+            <a href="#/complaint" onclick="document.getElementById('mobileMenu').classList.add('hidden')" class="text-2xl font-bold text-white hover:text-decha-secondary transition">ร้องเรียนสารวัตรฯ</a>
+            <a href="https://sarawatdc.site/sl-roster" target="_blank" onclick="document.getElementById('mobileMenu').classList.add('hidden')" class="text-2xl font-bold text-decha-dark bg-decha-secondary py-4 rounded-2xl transition shadow-lg mt-4">SI-ROASTER <i class="fa-solid fa-external-link-alt text-sm"></i></a>
+            <button onclick="checkAdminLogin(); document.getElementById('mobileMenu').classList.add('hidden')" class="mt-8 text-sm text-slate-400"><i class="fa-solid fa-lock"></i> ระบบหลังบ้าน</button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow pt-28 pb-20">
+        
+        <!-- VIEW: HOME -->
+        <section id="home-view" class="page-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Hero Banner -->
+            <div class="relative rounded-[2.5rem] overflow-hidden bg-decha-primary text-white p-10 md:p-20 mb-16 shadow-2xl animate-fade-in-up">
+                <!-- BG Blobs -->
+                <div class="absolute top-0 -left-4 w-72 h-72 bg-decha-secondary rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+                <div class="absolute top-0 -right-4 w-72 h-72 bg-emerald-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+                
+                <div class="relative z-10 max-w-3xl">
+                    <span class="inline-block py-1.5 px-4 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-sm font-semibold tracking-wider text-decha-secondary mb-6">WELCOME TO DECHA PREFECT</span>
+                    <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-[1.1]">
+                        ดูแลความเรียบร้อย<br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-decha-secondary to-yellow-100">ด้วยความยุติธรรม</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-emerald-100/90 mb-10 font-light max-w-2xl">
+                        องค์กรนักเรียนที่มุ่งมั่นส่งเสริมระเบียบวินัย ความปลอดภัย และสร้างบรรยากาศที่ดีภายในโรงเรียนเดชะปัตตนยานุกูล
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="https://sarawatdc.site/sl-roster" target="_blank" class="btn-premium px-8 py-4 rounded-full font-bold bg-decha-secondary text-decha-dark hover:bg-yellow-400 shadow-lg hover:-translate-y-1 transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-check"></i> ระบบลงหน้าที่ SI-ROASTER
+                        </a>
+                        <a href="#/report" class="btn-premium px-8 py-4 rounded-full font-bold bg-white/10 text-white border border-white/30 hover:bg-white/20 backdrop-blur-md shadow-lg hover:-translate-y-1 transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-bullhorn"></i> แจ้งเหตุด่วน
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News Bento Grid -->
+            <div class="mb-20 animate-fade-in-up stagger-1">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold text-slate-800 tracking-tight">ข่าวประชาสัมพันธ์</h2>
+                        <p class="text-slate-500 mt-1">อัปเดตกิจกรรมและผลงานล่าสุด</p>
+                    </div>
+                </div>
+                <div id="publicNewsGrid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-[250px]">
+                    <!-- Skeleton Loaders -->
+                    <div class="bento-item col-span-1 md:col-span-2 row-span-2 animate-pulse bg-slate-200"></div>
+                    <div class="bento-item animate-pulse bg-slate-200"></div>
+                    <div class="bento-item animate-pulse bg-slate-200"></div>
+                </div>
+            </div>
+
+            <!-- Personnel Section -->
+            <div class="animate-fade-in-up stagger-2">
+                <div class="text-center mb-12">
+                    <span class="text-decha-primary font-bold tracking-widest uppercase text-sm bg-decha-light px-4 py-1 rounded-full">Our Team</span>
+                    <h2 class="text-3xl font-bold text-slate-800 mt-4 mb-4">ทำเนียบบุคลากร</h2>
+                    <p class="text-slate-500 max-w-2xl mx-auto">คณะผู้บริหาร ครูที่ปรึกษา และทีมสารวัตรนักเรียน</p>
+                </div>
+                <!-- Filter -->
+                <div class="flex justify-center mb-10">
+                    <div class="bg-white p-1.5 rounded-full shadow-sm border border-slate-200 inline-flex">
+                        <button onclick="setTeamFilter('advisor', this)" class="team-filter-btn active-filter px-6 py-2 rounded-full font-semibold text-sm transition-all text-white bg-decha-primary">ผู้บริหาร/ครูที่ปรึกษา</button>
+                        <button onclick="setTeamFilter('prefect', this)" class="team-filter-btn px-6 py-2 rounded-full font-semibold text-sm transition-all text-slate-500 hover:text-slate-800">ทีมสารวัตรนักเรียน</button>
+                    </div>
+                </div>
+                <div id="publicPersonnelGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Loaded via JS -->
+                    <div class="col-span-full py-10 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin text-2xl"></i> กำลังโหลดข้อมูล...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: REPORT (General Incidents) -->
+        <section id="report-view" class="page-view max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-card p-8 md:p-12 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-red-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3 z-0"></div>
+                
+                <div class="relative z-10 text-center mb-10">
+                    <div class="w-20 h-20 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6 shadow-sm border border-red-100">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-slate-800 mb-2">แจ้งเหตุทั่วไป</h2>
+                    <p class="text-slate-500">พบเห็นเหตุการณ์ผิดระเบียบ, ทะเลาะวิวาท, หรือต้องการความช่วยเหลือด่วน</p>
+                </div>
+
+                <form onsubmit="submitReport(event, 'incident')" class="relative z-10 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">หัวข้อเหตุการณ์ <span class="text-red-500">*</span></label>
+                            <input type="text" id="incTopic" required class="input-premium" placeholder="เช่น สูบบุหรี่, ทะเลาะวิวาท">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">สถานที่เกิดเหตุ <span class="text-red-500">*</span></label>
+                            <input type="text" id="incLocation" required class="input-premium" placeholder="ระบุให้ชัดเจน เช่น หลังอาคาร 3">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">รายละเอียดเพิ่มเติม <span class="text-red-500">*</span></label>
+                        <textarea id="incDetail" required rows="4" class="input-premium resize-none" placeholder="อธิบายสิ่งที่พบเห็น..."></textarea>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-4 items-start">
+                        <i class="fa-solid fa-circle-info text-blue-500 mt-1"></i>
+                        <p class="text-sm text-blue-800">ข้อมูลของคุณจะถูกเก็บเป็นความลับ การแจ้งเหตุเท็จมีความผิดตามระเบียบของโรงเรียน</p>
+                    </div>
+                    <div class="text-center pt-4">
+                        <button type="submit" id="btnSubmitInc" class="px-8 py-4 bg-decha-primary text-white rounded-full font-bold shadow-lg hover:bg-decha-dark hover:-translate-y-1 transition-all w-full md:w-auto">
+                            <i class="fa-solid fa-paper-plane"></i> ยืนยันการแจ้งเหตุ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW: COMPLAINT (Against Prefects) -->
+        <section id="complaint-view" class="page-view max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-card p-8 md:p-12 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-orange-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3 z-0"></div>
+                
+                <div class="relative z-10 text-center mb-10">
+                    <div class="w-20 h-20 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6 shadow-sm border border-orange-100">
+                        <i class="fa-solid fa-gavel"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-slate-800 mb-2">ร้องเรียนการทำงาน</h2>
+                    <p class="text-slate-500">ร้องเรียนพฤติกรรมหรือการปฏิบัติหน้าที่ของสารวัตรนักเรียนที่ไม่เหมาะสม</p>
+                </div>
+
+                <form onsubmit="submitReport(event, 'complaint')" class="relative z-10 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">หัวข้อเรื่องร้องเรียน <span class="text-red-500">*</span></label>
+                            <input type="text" id="comTopic" required class="input-premium" placeholder="เช่น ใช้วาจาไม่เหมาะสม">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">ชื่อสารวัตรที่ร้องเรียน (ถ้าทราบ)</label>
+                            <input type="text" id="comTarget" class="input-premium" placeholder="ชื่อ-สกุล หรือลักษณะรูปพรรณ">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">รายละเอียดเหตุการณ์ <span class="text-red-500">*</span></label>
+                        <textarea id="comDetail" required rows="4" class="input-premium resize-none" placeholder="ระบุวัน เวลา สถานที่ และเหตุการณ์ที่เกิดขึ้น..."></textarea>
+                    </div>
+                    <div class="text-center pt-4">
+                        <button type="submit" id="btnSubmitCom" class="px-8 py-4 bg-orange-500 text-white rounded-full font-bold shadow-lg hover:bg-orange-600 hover:-translate-y-1 transition-all w-full md:w-auto">
+                            <i class="fa-solid fa-paper-plane"></i> ส่งเรื่องร้องเรียน
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW: ADMIN -->
+        <section id="admin-view" class="page-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-card overflow-hidden flex flex-col md:flex-row min-h-[70vh] shadow-2xl">
+                <!-- Sidebar -->
+                <div class="w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col">
+                    <div class="p-6 border-b border-slate-800 text-center">
+                        <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-shield-halved text-decha-secondary"></i> CMS Admin</h2>
+                    </div>
+                    <div class="p-4 flex flex-col gap-2 flex-grow">
+                        <button onclick="switchAdminTab('news')" class="adm-tab-btn active text-left px-4 py-3 rounded-xl flex items-center gap-3 font-medium text-white bg-slate-800 border-l-4 border-decha-secondary transition-all">
+                            <i class="fa-solid fa-newspaper w-5"></i> ข่าวสาร
+                        </button>
+                        <button onclick="switchAdminTab('personnel')" class="adm-tab-btn text-left px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition-all flex items-center gap-3 font-medium">
+                            <i class="fa-solid fa-users-gear w-5"></i> บุคลากร
+                        </button>
+                        <button onclick="switchAdminTab('reports')" class="adm-tab-btn text-left px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition-all flex items-center gap-3 font-medium">
+                            <i class="fa-solid fa-triangle-exclamation w-5"></i> แจ้งเหตุ
+                        </button>
+                        <button onclick="switchAdminTab('complaints')" class="adm-tab-btn text-left px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition-all flex items-center gap-3 font-medium">
+                            <i class="fa-solid fa-gavel w-5"></i> ร้องเรียน
+                        </button>
+                    </div>
+                    <div class="p-4 border-t border-slate-800 mt-auto">
+                        <button onclick="logoutAdmin()" class="w-full text-left px-4 py-3 rounded-xl text-red-400 hover:bg-red-400/10 transition flex items-center gap-3 font-medium">
+                            <i class="fa-solid fa-arrow-right-from-bracket w-5"></i> ออกจากระบบ
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Content Area -->
+                <div class="flex-grow bg-slate-50 p-6 md:p-10 h-[70vh] overflow-y-auto">
+                    
+                    <!-- Admin: News -->
+                    <div id="adm-tab-news" class="adm-content-panel block animate-fade-in-up">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-2xl font-bold text-slate-800">จัดการข่าวสาร</h3>
+                            <button onclick="openModal('modalAddNews')" class="bg-decha-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow hover:bg-decha-dark transition"><i class="fa-solid fa-plus"></i> เพิ่ม</button>
+                        </div>
+                        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 border-b border-slate-200 text-slate-500">
+                                    <tr><th class="p-4">รูปภาพ</th><th class="p-4">หัวข้อ</th><th class="p-4">จัดการ</th></tr>
+                                </thead>
+                                <tbody id="admNewsTable" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Admin: Personnel -->
+                    <div id="adm-tab-personnel" class="adm-content-panel hidden animate-fade-in-up">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-2xl font-bold text-slate-800">จัดการบุคลากร</h3>
+                            <button onclick="openModal('modalAddPerson')" class="bg-decha-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow hover:bg-decha-dark transition"><i class="fa-solid fa-plus"></i> เพิ่ม</button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="admPersonGrid"></div>
+                    </div>
+
+                    <!-- Admin: Reports -->
+                    <div id="adm-tab-reports" class="adm-content-panel hidden animate-fade-in-up">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-6">รายการแจ้งเหตุทั่วไป</h3>
+                        <div class="space-y-4" id="admReportsList"></div>
+                    </div>
+
+                    <!-- Admin: Complaints -->
+                    <div id="adm-tab-complaints" class="adm-content-panel hidden animate-fade-in-up">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-6">รายการร้องเรียนสารวัตร</h3>
+                        <div class="space-y-4" id="admComplaintsList"></div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t-[6px] border-decha-secondary pt-16 pb-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center md:items-start gap-8 mb-10">
+                <div class="text-center md:text-left">
+                    <div class="flex items-center justify-center md:justify-start gap-3 mb-4">
+                        <i class="fa-solid fa-shield-halved text-3xl text-decha-secondary"></i>
+                        <h2 class="text-2xl font-bold text-white tracking-wider font-inter">SARAWAT DECHA</h2>
+                    </div>
+                    <p class="text-slate-400 text-sm max-w-sm">
+                        สารวัตรนักเรียน โรงเรียนเดชะปัตตนยานุกูล<br>
+                        "เรียนดี วินัยเด่น บำเพ็ญประโยชน์"
+                    </p>
+                </div>
+                <div class="flex gap-4">
+                    <a href="https://sarawatdc.site" target="_blank" class="w-10 h-10 rounded-full bg-slate-800 text-slate-400 hover:bg-decha-secondary hover:text-slate-900 flex items-center justify-center transition-colors"><i class="fa-solid fa-globe"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 text-slate-400 hover:bg-blue-500 hover:text-white flex items-center justify-center transition-colors"><i class="fa-brands fa-facebook-f"></i></a>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 pt-8 text-center text-xs text-slate-600">
+                <p>&copy; 2026 Dechapattanayanukul School. System built with 💚 by Rujira.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Admin Modals -->
+    <div id="modalAddNews" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center opacity-0 transition-opacity">
+        <div class="bg-white rounded-3xl p-8 w-full max-w-lg shadow-2xl">
+            <h3 class="text-2xl font-bold text-slate-800 mb-6">เพิ่มข่าวสาร</h3>
+            <form onsubmit="submitNews(event)" class="space-y-4">
+                <input type="text" id="mNewsTitle" required class="input-premium" placeholder="หัวข้อข่าว">
+                <input type="url" id="mNewsImg" required class="input-premium" placeholder="URL รูปภาพ">
+                <textarea id="mNewsDetail" required rows="3" class="input-premium" placeholder="รายละเอียด"></textarea>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeModal('modalAddNews')" class="flex-1 px-4 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">ยกเลิก</button>
+                    <button type="submit" class="flex-1 px-4 py-3 bg-decha-primary text-white rounded-xl font-bold">บันทึก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalAddPerson" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center opacity-0 transition-opacity">
+        <div class="bg-white rounded-3xl p-8 w-full max-w-lg shadow-2xl">
+            <h3 class="text-2xl font-bold text-slate-800 mb-6">เพิ่มบุคลากร</h3>
+            <form onsubmit="submitPerson(event)" class="space-y-4">
+                <input type="text" id="mPersName" required class="input-premium" placeholder="ชื่อ - นามสกุล">
+                <select id="mPersType" required class="input-premium">
+                    <option value="advisor">ครูที่ปรึกษา / ผู้บริหาร</option>
+                    <option value="prefect">สารวัตรนักเรียน</option>
+                </select>
+                <input type="text" id="mPersRole" required class="input-premium" placeholder="ตำแหน่ง (เช่น หัวหน้า, ฝ่ายตรวจ)">
+                <input type="url" id="mPersImg" required class="input-premium" placeholder="URL รูปภาพ">
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeModal('modalAddPerson')" class="flex-1 px-4 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">ยกเลิก</button>
+                    <button type="submit" class="flex-1 px-4 py-3 bg-decha-primary text-white rounded-xl font-bold">บันทึก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Globals provided by system
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'sarawat-prefect-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { projectId: "mock-id" };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let isAdmin = false; // Local state mock for CMS UI
+
+        // Strict Paths (Rule 1)
+        const newsRef = collection(db, 'artifacts', appId, 'public', 'data', 'news');
+        const persRef = collection(db, 'artifacts', appId, 'public', 'data', 'personnel');
+        const repRef = collection(db, 'artifacts', appId, 'public', 'data', 'reports');
+        const comRef = collection(db, 'artifacts', appId, 'public', 'data', 'complaints');
+
+        let dataCache = { news: [], pers: [], reps: [], coms: [] };
+
+        // Authenticaton (Rule 3)
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) { console.error("Auth Error:", e); }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                setupListeners();
+            }
+        });
+
+        // ==========================================
+        // ROUTER LOGIC (Hash Routing)
+        // ==========================================
+        function handleRouting() {
+            let hash = window.location.hash || '#/home';
+            // Hide all views
+            document.querySelectorAll('.page-view').forEach(el => {
+                el.classList.remove('active');
+            });
+            // Reset nav links
+            document.querySelectorAll('.nav-link').forEach(el => {
+                el.classList.remove('text-decha-primary', 'bg-white');
+            });
+
+            // Map hash to element ID
+            let targetId = hash.replace('#/', '') + '-view';
+            let targetEl = document.getElementById(targetId);
+            
+            // Fallback
+            if(!targetEl) { targetId = 'home-view'; targetEl = document.getElementById('home-view'); hash = '#/home'; }
+
+            // Show target
+            targetEl.classList.add('active');
+            
+            // Re-trigger animation
+            targetEl.classList.remove('animate-fade-in-up');
+            void targetEl.offsetWidth; // Reflow
+            targetEl.classList.add('animate-fade-in-up');
+
+            // Highlight nav
+            const activeNav = document.querySelector(`.nav-link[href="${hash}"]`);
+            if(activeNav) activeNav.classList.add('text-decha-primary', 'bg-white');
+
+            window.scrollTo(0,0);
+        }
+
+        window.addEventListener('hashchange', handleRouting);
+        window.addEventListener('DOMContentLoaded', handleRouting); // Initial load
+
+        // ==========================================
+        // DATA LISTENERS & RENDERERS
+        // ==========================================
+        function setupListeners() {
+            // News
+            onSnapshot(newsRef, snap => {
+                dataCache.news = [];
+                snap.forEach(d => dataCache.news.push({ id: d.id, ...d.data() }));
+                dataCache.news.sort((a,b) => b.ts - a.ts);
+                renderNews();
+            }, e => console.error(e));
+
+            // Personnel
+            onSnapshot(persRef, snap => {
+                dataCache.pers = [];
+                snap.forEach(d => dataCache.pers.push({ id: d.id, ...d.data() }));
+                renderPersonnel();
+            }, e => console.error(e));
+
+            // Reports
+            onSnapshot(repRef, snap => {
+                dataCache.reps = [];
+                snap.forEach(d => dataCache.reps.push({ id: d.id, ...d.data() }));
+                dataCache.reps.sort((a,b) => b.ts - a.ts);
+                if(isAdmin) renderAdminReports();
+            }, e => console.error(e));
+
+            // Complaints
+            onSnapshot(comRef, snap => {
+                dataCache.coms = [];
+                snap.forEach(d => dataCache.coms.push({ id: d.id, ...d.data() }));
+                dataCache.coms.sort((a,b) => b.ts - a.ts);
+                if(isAdmin) renderAdminComplaints();
+            }, e => console.error(e));
+        }
+
+        function renderNews() {
+            // Public View (Bento)
+            const pGrid = document.getElementById('publicNewsGrid');
+            if(dataCache.news.length === 0) {
+                pGrid.innerHTML = '<div class="col-span-full py-10 text-center text-slate-400">ยังไม่มีข่าวประชาสัมพันธ์ในขณะนี้</div>';
+            } else {
+                pGrid.innerHTML = '';
+                dataCache.news.slice(0,4).forEach((n, idx) => {
+                    const isLarge = idx === 0;
+                    const cClass = isLarge ? "bento-item col-span-1 md:col-span-2 row-span-2 group" : "bento-item group";
+                    const fallback = `https://placehold.co/600x400/064E3B/FBBF24?text=News`;
+                    const dt = new Date(n.ts).toLocaleDateString('th-TH');
+                    pGrid.innerHTML += `
+                        <div class="${cClass}">
+                            <img src="${n.img || fallback}" onerror="this.src='${fallback}'" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                            <div class="absolute inset-0 bg-gradient-to-t ${isLarge ? 'from-black/90' : 'from-black/80'} to-transparent z-10"></div>
+                            <div class="absolute bottom-0 left-0 w-full p-6 z-20 text-white">
+                                <span class="text-decha-secondary text-sm font-semibold mb-1 block"><i class="fa-regular fa-clock"></i> ${dt}</span>
+                                <h3 class="${isLarge ? 'text-2xl md:text-3xl' : 'text-xl'} font-bold leading-tight mb-2">${n.title}</h3>
+                                <p class="text-slate-200 text-sm line-clamp-2 ${isLarge ? 'block' : 'hidden'}">${n.detail}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Admin View
+            if(isAdmin) {
+                const aTable = document.getElementById('admNewsTable');
+                aTable.innerHTML = dataCache.news.map(n => `
+                    <tr>
+                        <td class="p-4"><img src="${n.img}" class="w-16 h-10 object-cover rounded"></td>
+                        <td class="p-4 font-medium text-slate-800">${n.title}</td>
+                        <td class="p-4"><button onclick="window.delDoc('news', '${n.id}')" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        let currFilter = 'advisor';
+        window.setTeamFilter = function(type, btn) {
+            currFilter = type;
+            document.querySelectorAll('.team-filter-btn').forEach(el => {
+                el.classList.remove('bg-decha-primary', 'text-white', 'active-filter');
+                el.classList.add('text-slate-500');
+            });
+            btn.classList.remove('text-slate-500');
+            btn.classList.add('bg-decha-primary', 'text-white', 'active-filter');
+            renderPersonnel();
+        }
+
+        function renderPersonnel() {
+            // Public
+            const pGrid = document.getElementById('publicPersonnelGrid');
+            const filtered = dataCache.pers.filter(p => p.type === currFilter);
+            if(filtered.length === 0) {
+                pGrid.innerHTML = '<div class="col-span-full text-center text-slate-400 py-10">ไม่มีข้อมูลในหมวดนี้</div>';
+            } else {
+                pGrid.innerHTML = filtered.map(p => {
+                    const fallback = `https://placehold.co/400x400/F8FAFC/064E3B?text=${p.name.charAt(0)}`;
+                    return `
+                    <div class="bg-white rounded-3xl p-6 text-center border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition duration-300">
+                        <img src="${p.img || fallback}" onerror="this.src='${fallback}'" class="w-28 h-28 mx-auto rounded-full object-cover mb-4 border-4 border-slate-50 shadow-inner">
+                        <h4 class="text-lg font-bold text-slate-800">${p.name}</h4>
+                        <span class="inline-block mt-2 px-3 py-1 bg-decha-light text-decha-primary text-xs font-semibold rounded-full">${p.role}</span>
+                    </div>
+                    `;
+                }).join('');
+            }
+
+            // Admin
+            if(isAdmin) {
+                const aGrid = document.getElementById('admPersonGrid');
+                aGrid.innerHTML = dataCache.pers.map(p => `
+                    <div class="bg-white p-4 rounded-xl border flex items-center gap-4 relative">
+                        <img src="${p.img}" class="w-12 h-12 rounded-full object-cover">
+                        <div><h4 class="font-bold text-sm">${p.name}</h4><span class="text-xs text-decha-primary">${p.role}</span></div>
+                        <button onclick="window.delDoc('pers', '${p.id}')" class="absolute top-2 right-2 text-slate-300 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderAdminReports() {
+            document.getElementById('admReportsList').innerHTML = dataCache.reps.map(r => `
+                <div class="bg-white p-5 rounded-2xl border">
+                    <div class="flex justify-between"><h4 class="font-bold text-slate-800">${r.topic}</h4><span class="text-xs bg-slate-100 px-2 py-1 rounded text-slate-500">${new Date(r.ts).toLocaleString()}</span></div>
+                    <p class="text-sm text-slate-500 mt-1"><i class="fa-solid fa-location-dot"></i> ${r.location}</p>
+                    <div class="mt-3 bg-slate-50 p-3 rounded text-sm text-slate-700">${r.detail}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderAdminComplaints() {
+            document.getElementById('admComplaintsList').innerHTML = dataCache.coms.map(c => `
+                <div class="bg-white p-5 rounded-2xl border border-orange-100">
+                    <div class="flex justify-between"><h4 class="font-bold text-orange-600">${c.topic}</h4><span class="text-xs bg-slate-100 px-2 py-1 rounded text-slate-500">${new Date(c.ts).toLocaleString()}</span></div>
+                    <p class="text-sm text-slate-500 mt-1"><i class="fa-solid fa-user-tag"></i> ร้องเรียนถึง: ${c.target || 'ไม่ระบุ'}</p>
+                    <div class="mt-3 bg-orange-50 p-3 rounded text-sm text-slate-700">${c.detail}</div>
+                </div>
+            `).join('');
+        }
+
+        // ==========================================
+        // FORM SUBMISSIONS
+        // ==========================================
+
+        window.submitReport = async function(e, type) {
+            e.preventDefault();
+            if(!currentUser) { Swal.fire('Error', 'รอระบบสักครู่', 'error'); return; }
+            
+            const btn = e.target.querySelector('button[type="submit"]');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังส่ง...';
+            btn.disabled = true;
+
+            try {
+                if(type === 'incident') {
+                    await addDoc(repRef, {
+                        topic: document.getElementById('incTopic').value,
+                        location: document.getElementById('incLocation').value,
+                        detail: document.getElementById('incDetail').value,
+                        ts: Date.now()
+                    });
+                } else {
+                    await addDoc(comRef, {
+                        topic: document.getElementById('comTopic').value,
+                        target: document.getElementById('comTarget').value,
+                        detail: document.getElementById('comDetail').value,
+                        ts: Date.now()
+                    });
+                }
+                Swal.fire('สำเร็จ', 'ส่งข้อมูลเรียบร้อยแล้ว ขอบคุณที่แจ้งเหตุ', 'success').then(() => {
+                    e.target.reset();
+                    window.location.hash = '#/home';
+                });
+            } catch(err) {
+                Swal.fire('ข้อผิดพลาด', err.message, 'error');
+            } finally {
+                btn.innerHTML = orig;
+                btn.disabled = false;
+            }
+        };
+
+        // ==========================================
+        // ADMIN CMS LOGIC
+        // ==========================================
+        window.checkAdminLogin = function() {
+            if(isAdmin) { window.location.hash = '#/admin'; return; }
+            Swal.fire({
+                title: 'Admin Access',
+                input: 'password',
+                inputPlaceholder: 'ใส่รหัสผ่าน (demo: 1234)',
+                showCancelButton: true,
+                confirmButtonColor: '#064E3B'
+            }).then(res => {
+                if(res.isConfirmed && res.value === '1234') {
+                    isAdmin = true;
+                    window.location.hash = '#/admin';
+                    renderNews(); renderPersonnel(); renderAdminReports(); renderAdminComplaints();
+                    Swal.fire('ยินดีต้อนรับ', 'เข้าสู่ระบบหลังบ้านสำเร็จ', 'success');
+                } else if(res.isConfirmed) {
+                    Swal.fire('ผิดพลาด', 'รหัสผ่านไม่ถูกต้อง', 'error');
+                }
+            });
+        };
+
+        window.logoutAdmin = function() {
+            isAdmin = false;
+            window.location.hash = '#/home';
+            Swal.fire('สำเร็จ', 'ออกจากระบบเรียบร้อย', 'success');
+        };
+
+        window.switchAdminTab = function(tab) {
+            document.querySelectorAll('.adm-content-panel').forEach(el => { el.classList.add('hidden'); el.classList.remove('block'); });
+            document.getElementById(`adm-tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`adm-tab-${tab}`).classList.add('block');
+            
+            document.querySelectorAll('.adm-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-800', 'border-l-4', 'border-decha-secondary', 'text-white');
+                btn.classList.add('text-slate-300');
+            });
+            event.currentTarget.classList.add('bg-slate-800', 'border-l-4', 'border-decha-secondary', 'text-white');
+        };
+
+        window.openModal = function(id) {
+            const m = document.getElementById(id);
+            m.classList.remove('hidden');
+            setTimeout(() => m.classList.replace('opacity-0', 'opacity-100'), 10);
+        };
+        window.closeModal = function(id) {
+            const m = document.getElementById(id);
+            m.classList.replace('opacity-100', 'opacity-0');
+            setTimeout(() => m.classList.add('hidden'), 300);
+        };
+
+        window.submitNews = async function(e) {
+            e.preventDefault();
+            if(!currentUser) return;
+            try {
+                await addDoc(newsRef, {
+                    title: document.getElementById('mNewsTitle').value,
+                    img: document.getElementById('mNewsImg').value,
+                    detail: document.getElementById('mNewsDetail').value,
+                    ts: Date.now()
+                });
+                Swal.fire('สำเร็จ', 'เพิ่มข่าวเรียบร้อย', 'success');
+                e.target.reset(); closeModal('modalAddNews');
+            } catch(e) { Swal.fire('Error', e.message, 'error'); }
+        };
+
+        window.submitPerson = async function(e) {
+            e.preventDefault();
+            if(!currentUser) return;
+            try {
+                await addDoc(persRef, {
+                    name: document.getElementById('mPersName').value,
+                    type: document.getElementById('mPersType').value,
+                    role: document.getElementById('mPersRole').value,
+                    img: document.getElementById('mPersImg').value,
+                    ts: Date.now()
+                });
+                Swal.fire('สำเร็จ', 'เพิ่มบุคลากรเรียบร้อย', 'success');
+                e.target.reset(); closeModal('modalAddPerson');
+            } catch(e) { Swal.fire('Error', e.message, 'error'); }
+        };
+
+        window.delDoc = async function(type, id) {
+            if(!currentUser) return;
+            Swal.fire({title:'ลบข้อมูล?', icon:'warning', showCancelButton:true, confirmButtonColor:'#EF4444'}).then(async r => {
+                if(r.isConfirmed) {
+                    const ref = doc(db, 'artifacts', appId, 'public', 'data', type === 'news' ? 'news' : 'personnel', id);
+                    await deleteDoc(ref);
+                }
+            });
+        };
+
+        initAuth();
+    </script>
+</body>
+</html>
