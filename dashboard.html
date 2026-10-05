@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="th"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>แดชบอร์ดเหตุการณ์ – โรงเรียนเดชะปัตตนยานุกูล</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="css/checkin.css"/>
+<style>
+.main-content{max-width:1200px;display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;align-items:start}
+#map{height:75vh;border-radius:var(--radius);position:sticky;top:80px;z-index:1}
+.left{display:flex;flex-direction:column;gap:.9rem}.tabs{display:flex;gap:.5rem;flex-wrap:wrap}
+.tab{border:1.5px solid var(--gray-200);background:#fff;border-radius:50px;padding:.4rem 1rem;cursor:pointer;font-family:inherit;font-weight:600;color:var(--gray-600)}
+.tab.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+.inc{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem 1.25rem;border-left:6px solid var(--accent);cursor:pointer}
+.inc.progress{border-left-color:#f4a261}.inc.done{border-left-color:var(--success);opacity:.8}
+.inc h3{font-size:1.05rem}.meta{font-size:.82rem;color:var(--gray-500);margin:.25rem 0 .6rem}.row{font-size:.9rem;margin:.15rem 0}
+.ph{display:flex;gap:.5rem;margin-top:.5rem}.ph img{width:90px;height:90px;object-fit:cover;border-radius:8px;background:var(--gray-100)}
+.btns{display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap}
+.btns button{border:none;border-radius:8px;padding:.4rem .9rem;font-family:inherit;font-weight:600;cursor:pointer;background:var(--primary);color:#fff}
+.btns .del{background:#fff;color:var(--accent);border:1px solid var(--accent)}.empty{text-align:center;color:var(--gray-400);padding:2rem}
+.pin{width:28px;height:28px;border-radius:50%;border:3px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-size:14px}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:5000}
+#lb img{max-width:95%;max-height:95%}
+@media(max-width:800px){.main-content{grid-template-columns:1fr}#map{height:45vh;position:static;order:-1}}
+</style></head><body>
+<header class="topbar"><div class="topbar-inner" style="max-width:1200px">
+  <div class="topbar-brand"><img src="school-logo.png" class="topbar-logo" alt="" onerror="this.style.display='none'"/>
+    <div><span class="topbar-title">เหตุการณ์ในโรงเรียน</span><span class="topbar-sep">|</span><span class="topbar-sub">เดชะปัตตนยานุกูล</span></div></div>
+  <div class="topbar-right"><span class="user-name" id="uname"></span><button class="btn-logout" onclick="logout()">ออก</button></div>
+</div></header>
+<main class="main-content">
+  <div class="left"><div class="tabs" id="tabs"></div><div id="list" class="left"></div></div>
+  <div id="map"></div>
+</main>
+<div id="lb" onclick="this.style.display='none'"><img id="lbi" alt=""/></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="js/config.js"></script>
+<script>
+const token=sessionStorage.getItem('tok'),isAdmin=sessionStorage.getItem('role')==='admin';
+if(!token)location.href='index.html';
+uname.textContent=sessionStorage.getItem('name')||'';
+const ST={new:'รอดำเนินการ',progress:'กำลังดำเนินการ',done:'เสร็จสิ้น'},COL={new:'#e63946',progress:'#f4a261',done:'#2d9d78'};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let data=[],filter='all',markers={},known=null,last='';
+
+const map=L.map('map').setView([SCHOOL.lat,SCHOOL.lng],SCHOOL.zoom);
+const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:20,attribution:'Esri'}).addTo(map);
+const osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19});
+L.control.layers({'ภาพถ่ายดาวเทียม':sat,'แผนที่ถนน':osm}).addTo(map);
+
+function render(){
+  const cnt=k=>k==='all'?data.length:data.filter(i=>i.status===k).length;
+  tabs.innerHTML=['all','new','progress','done'].map(k=>`<button class="tab ${filter===k?'on':''}" data-f="${k}">${k==='all'?'ทั้งหมด':ST[k]} (${cnt(k)})</button>`).join('');
+  const rows=data.filter(i=>filter==='all'||i.status===filter);
+  list.innerHTML=rows.length?rows.map(i=>`<div class="inc ${i.status}" data-id="${i.id}">
+    <h3>${esc(i.type)}</h3><div class="meta">${new Date(i.time).toLocaleString('th-TH')} · ${ST[i.status]}${i.handledBy?' · โดย '+esc(i.handledBy):''}</div>
+    <div class="row">📍 ${esc(i.location)||'-'}</div>
+    <div class="row">👤 ผู้แจ้ง: ${esc(i.reporter)} (${esc(i.role)})</div>
+    ${i.students?`<div class="row">🎒 เกี่ยวข้อง: ${esc(i.students)}</div>`:''}
+    ${i.detail?`<div class="row">📝 ${esc(i.detail)}</div>`:''}
+    ${i.photoIds.length?`<div class="ph">${i.photoIds.map(p=>`<img data-pid="${p}" data-ph alt="">`).join('')}</div>`:''}
+    <div class="btns">
+      ${i.status==='new'?`<button data-s="progress">รับเรื่อง</button>`:''}
+      ${i.status==='progress'?`<button data-s="done">ปิดเรื่อง</button>`:''}
+      ${isAdmin?`<button class="del" data-del>ลบ</button>`:''}</div></div>`).join(''):'<div class="empty">ยังไม่มีเหตุการณ์</div>';
+  Object.values(markers).forEach(m=>map.removeLayer(m));markers={};
+  rows.forEach(i=>{markers[i.id]=L.marker([i.lat,i.lng],{icon:L.divIcon({className:'',iconSize:[28,28],
+      html:`<div class="pin" style="background:${COL[i.status]}">${esc([...i.type][0])}</div>`})})
+      .addTo(map).bindPopup(`<b>${esc(i.type)}</b><br>${esc(i.location)}<br>${ST[i.status]}`)
+      .on('click',()=>document.querySelector(`[data-id="${i.id}"]`)?.scrollIntoView({behavior:'smooth',block:'center'}));});
+  hydrate();
+}
+const imgCache={};
+function hydrate(){document.querySelectorAll('img[data-pid]:not([src])').forEach(async el=>{
+  const id=el.dataset.pid;
+  try{imgCache[id]=imgCache[id]||api('photo',{token,id}).then(j=>j.data);el.src=await imgCache[id];}
+  catch(e){delete imgCache[id];el.alt='โหลดรูปไม่ได้';}});}
+tabs.onclick=e=>{if(e.target.dataset.f){filter=e.target.dataset.f;render();}};
+list.onclick=async e=>{
+  const card=e.target.closest('.inc');if(!card)return;const id=card.dataset.id,t=e.target;
+  try{
+    if(t.dataset.s){t.disabled=true;await api('update',{token,id,status:t.dataset.s});await load(true);}
+    else if(t.hasAttribute('data-del')){if(confirm('ลบเหตุการณ์นี้?')){await api('remove',{token,id});await load(true);}}
+    else if(t.hasAttribute('data-ph')){if(t.src){lbi.src=t.src;lb.style.display='flex';}}
+    else if(markers[id]){map.flyTo(markers[id].getLatLng(),19);markers[id].openPopup();}
+  }catch(x){alert(x.message);}
+};
+function logout(){sessionStorage.clear();location.href='index.html';}
+async function load(force){
+  try{const j=await api('list',{token});const s=JSON.stringify(j.items);
+    if(s===last&&!force)return;last=s;data=j.items;
+    if(known&&data.some(i=>!known.has(i.id)&&i.status==='new'))document.title='🔔 มีเหตุใหม่!';
+    known=new Set(data.map(i=>i.id));render();
+  }catch(e){if(/unauthorized/.test(e.message))logout();}
+}
+load();setInterval(()=>{if(!document.hidden)load();},8000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)document.title='เหตุการณ์ในโรงเรียน';});
+</script></body></html>

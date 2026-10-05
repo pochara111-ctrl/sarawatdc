@@ -1,167 +1,84 @@
 <!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แจ้งเหตุออนไลน์ | สารวัตรนักเรียน</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Prompt:wght@500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { darkMode: 'media', theme: { extend: { fontFamily: { kanit: ['Kanit'], prompt: ['Prompt'] } } } }</script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-kanit">
+<html lang="th"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>แจ้งเหตุ – โรงเรียนเดชะปัตตนยานุกูล</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="css/checkin.css"/>
+<style>.thumbs{display:flex;gap:.5rem;flex-wrap:wrap}.thumbs img{width:80px;height:80px;object-fit:cover;border-radius:8px}</style>
+</head><body>
+<header class="topbar"><div class="topbar-inner">
+  <div class="topbar-brand"><img src="school-logo.png" class="topbar-logo" alt="" onerror="this.style.display='none'"/>
+    <div><span class="topbar-title">แจ้งเหตุ</span><span class="topbar-sep">|</span><span class="topbar-sub">โรงเรียนเดชะปัตตนยานุกูล</span></div></div>
+</div></header>
+<main class="main-content">
+  <section class="card" id="form-sec">
+    <div class="card-hd blue"><div class="card-hd-icon">🚨</div><div>
+      <h2 class="card-title">แจ้งเหตุในโรงเรียน</h2><p class="card-desc">กรอกข้อมูลให้ครบถ้วน</p></div></div>
+    <div class="card-body">
+      <input id="hp" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off" aria-hidden="true"/>
+      <div class="field-group"><label class="field-label" for="f-name"><span class="badge-num">1</span> ชื่อผู้แจ้ง</label>
+        <input id="f-name" class="inp" placeholder="ชื่อ-นามสกุล" maxlength="80"/></div>
+      <div class="field-group"><label class="field-label" for="f-role"><span class="badge-num">2</span> สถานะผู้แจ้ง</label>
+        <select id="f-role" class="sel" style="padding-right:1rem"><option>นักเรียน</option><option>ครู</option><option>บุคลากร</option><option>อื่นๆ</option></select></div>
+      <div class="field-group"><label class="field-label" for="f-type"><span class="badge-num">3</span> ประเภทเหตุ</label>
+        <select id="f-type" class="sel" style="padding-right:1rem">
+          <option value="">— เลือกประเภทเหตุ —</option>
+          <option>🤒 นักเรียนเจ็บป่วย</option><option>🥊 ทะเลาะวิวาท</option>
+          <option>🚬 สูบบุหรี่ / บุหรี่ไฟฟ้า</option><option>📌 อื่นๆ</option></select></div>
+      <div class="field-group"><label class="field-label"><span class="badge-num">4</span> จุดเกิดเหตุบนแผนที่ (แตะแผนที่เพื่อปักหมุด)</label>
+        <div id="map" style="height:260px;border-radius:8px;z-index:1"></div>
+        <div id="loc-status" style="font-size:.75rem;color:#666">ยังไม่ได้ปักหมุด</div></div>
+      <div class="field-group"><label class="field-label" for="f-loc"><span class="badge-num">5</span> รายละเอียดสถานที่</label>
+        <input id="f-loc" class="inp" placeholder="เช่น อาคาร 3 ชั้น 2 ห้องน้ำ / ห้อง ม.2/1"/></div>
+      <div class="field-group"><label class="field-label" for="f-who"><span class="badge-num">6</span> นักเรียนที่เกี่ยวข้อง (ถ้าทราบ)</label>
+        <input id="f-who" class="inp" placeholder="ชื่อ / ชั้น"/></div>
+      <div class="field-group"><label class="field-label" for="f-detail"><span class="badge-num">7</span> รายละเอียดเพิ่มเติม</label>
+        <textarea id="f-detail" class="inp" rows="3"></textarea></div>
+      <div class="field-group"><label class="field-label"><span class="badge-num">8</span> แนบรูปภาพ (ไม่เกิน 2 รูป)</label>
+        <input type="file" id="f-photo" accept="image/*" multiple/><div class="thumbs" id="thumbs"></div></div>
+      <div class="actions"><button class="btn-next" id="btn" disabled>แจ้งเหตุ</button></div>
+    </div>
+  </section>
+  <section id="ok-sec" class="success-sec" style="display:none">
+    <div class="ok-circle">✓</div><h2 class="ok-title">แจ้งเหตุสำเร็จ!</h2>
+    <p class="ok-desc">เจ้าหน้าที่ได้รับเรื่องแล้ว</p>
+    <button class="btn-more" onclick="location.reload()">+ แจ้งเหตุใหม่</button></section>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="js/config.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+let pos=null,marker=null,photos=[];
+const map=L.map('map').setView([SCHOOL.lat,SCHOOL.lng],SCHOOL.zoom);
+const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:20,attribution:'Esri'}).addTo(map);
+const osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19});
+L.control.layers({'ภาพถ่ายดาวเทียม':sat,'แผนที่ถนน':osm}).addTo(map);
+const need=()=>$('btn').disabled=!($('f-name').value.trim()&&$('f-type').value&&pos);
+function setPos(ll,txt){pos={lat:ll.lat,lng:ll.lng};
+  if(marker)marker.setLatLng(ll);else{marker=L.marker(ll,{draggable:true}).addTo(map);
+    marker.on('dragend',()=>setPos(marker.getLatLng(),'📍 ย้ายหมุดแล้ว'));}
+  $('loc-status').textContent=txt;need();}
+map.on('click',e=>setPos(e.latlng,'📍 ปักหมุดแล้ว (ลากหมุดเพื่อแก้ไข)'));
+['f-name','f-type'].forEach(i=>$(i).addEventListener('input',need));
 
-    <nav class="w-full p-4 relative z-10">
-        <a href="/" class="inline-flex items-center gap-2 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 px-5 py-2.5 rounded-full shadow-sm border border-slate-200 dark:border-slate-700 hover:text-red-600 transition-colors">
-            <i class="fa-solid fa-arrow-left"></i> กลับหน้าหลัก
-        </a>
-    </nav>
+async function shrink(file){const b=await createImageBitmap(file),s=Math.min(1,1280/Math.max(b.width,b.height));
+  const c=document.createElement('canvas');c.width=b.width*s;c.height=b.height*s;
+  c.getContext('2d').drawImage(b,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.7);}
+$('f-photo').onchange=async e=>{photos=[];$('thumbs').innerHTML='';
+  for(const f of [...e.target.files].slice(0,2)){const d=await shrink(f);photos.push(d);
+    const i=new Image();i.src=d;$('thumbs').appendChild(i);}};
 
-    <main class="max-w-2xl mx-auto p-4 pt-8">
-        <div class="text-center mb-8">
-            <div class="w-20 h-20 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-5 shadow-lg"><i class="fa-solid fa-bullhorn"></i></div>
-            <h1 class="text-3xl md:text-4xl font-prompt font-bold mb-2">แจ้งเหตุออนไลน์</h1>
-            <p class="text-slate-500 dark:text-slate-400">พบเหตุทะเลาะวิวาทหรืออุบัติเหตุ แจ้งสารวัตรตรวจสอบทันที</p>
-        </div>
+$('btn').onclick=async()=>{
+  $('btn').disabled=true;$('btn').textContent='กำลังส่ง…';
+  try{await api('report',{hp:$('hp').value,reporter:$('f-name').value.trim(),role:$('f-role').value,type:$('f-type').value,
+      location:$('f-loc').value.trim(),students:$('f-who').value.trim(),detail:$('f-detail').value.trim(),
+      lat:pos.lat,lng:pos.lng,photos});
+    $('form-sec').style.display='none';$('ok-sec').style.display='flex';
+  }catch(e){$('btn').disabled=false;$('btn').textContent='แจ้งเหตุ';alert('ส่งไม่สำเร็จ: '+e.message);}};
 
-        <div class="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-[2rem] shadow-xl border-t-4 border-red-500">
-            <form id="report-form" class="space-y-6">
-                <!-- Location & GPS -->
-                <div>
-                    <label class="block mb-2 font-medium">สถานที่เกิดเหตุ <span class="text-red-500">*</span></label>
-                    <div class="flex gap-2">
-                        <input type="text" id="location" required class="flex-1 px-5 py-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all dark:text-white" placeholder="ระบุสถานที่">
-                        <button type="button" onclick="getGPS()" class="px-5 bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-xl border border-blue-200 dark:border-blue-500/30 hover:bg-blue-100 transition-colors flex-shrink-0" id="gps-btn" title="ดึงพิกัด GPS"><i class="fa-solid fa-location-crosshairs text-xl"></i></button>
-                    </div>
-                    <input type="hidden" id="gps-coords">
-                </div>
-
-                <!-- Camera/Image -->
-                <div>
-                    <label class="block mb-2 font-medium">ภาพประกอบ (ถ่ายรูปเกิดเหตุ)</label>
-                    <div class="relative">
-                        <input type="file" id="image-file" accept="image/*" capture="environment" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="previewImage(this)">
-                        <div class="w-full py-8 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 flex flex-col items-center justify-center text-slate-500 bg-slate-50 dark:bg-slate-700/30 hover:bg-slate-100 transition-colors">
-                            <i class="fa-solid fa-camera text-3xl mb-3 text-red-400"></i>
-                            <span id="img-status" class="font-medium text-red-500">คลิกเพื่อเปิดกล้อง หรือเลือกรูปภาพ</span>
-                        </div>
-                    </div>
-                    <img id="img-preview" src="" class="hidden w-full h-56 object-cover rounded-xl mt-4 border border-slate-200 dark:border-slate-700 shadow-sm">
-                </div>
-
-                <div>
-                    <label class="block mb-2 font-medium">รายละเอียด <span class="text-red-500">*</span></label>
-                    <textarea id="details" required rows="4" class="w-full px-5 py-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all dark:text-white" placeholder="อธิบายสิ่งที่เกิดขึ้น..."></textarea>
-                </div>
-
-                <button type="submit" id="submit-btn" class="w-full py-4 rounded-xl bg-red-600 text-white font-bold text-lg hover:bg-red-700 shadow-[0_4px_15px_rgba(239,68,68,0.4)] transition-all flex items-center justify-center gap-2 group">
-                    <i class="fa-solid fa-paper-plane group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i> ส่งข้อมูลแจ้งเหตุ
-                </button>
-            </form>
-        </div>
-    </main>
-
-    <!-- Firebase SDK (Modular v11.6.1) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBTHk57HCEZgn8ydldHjOaFxVgy1Xtlpk8",
-            authDomain: "sarawatdc.firebaseapp.com",
-            projectId: "sarawatdc",
-            messagingSenderId: "403581597525",
-            appId: "1:403581597525:web:6fd3f19a881a0ca42661dc"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // Google Apps Script Web App URL
-        const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxQpKRlYoeM9u8epd6U-sDHZp3QMddu7q0vyyC61toIhWdex5SiebhTSXot-lawS_A/exec";
-        let selectedFile = null;
-
-        // GPS Function
-        window.getGPS = () => {
-            const btn = document.getElementById('gps-btn');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xl"></i>';
-            navigator.geolocation.getCurrentPosition(
-                (pos) => { 
-                    document.getElementById('gps-coords').value = `${pos.coords.latitude},${pos.coords.longitude}`; 
-                    btn.innerHTML = '<i class="fa-solid fa-check text-green-600 dark:text-green-400 text-xl"></i>'; 
-                    btn.classList.replace('bg-blue-50', 'bg-green-50'); 
-                    btn.classList.replace('dark:bg-blue-500/20', 'dark:bg-green-500/20'); 
-                },
-                (err) => { 
-                    btn.innerHTML = '<i class="fa-solid fa-xmark text-red-600 text-xl"></i>'; 
-                    Swal.fire('Error', 'กรุณาอนุญาตการเข้าถึงตำแหน่งพิกัด', 'error'); 
-                }
-            );
-        };
-
-        // Image Preview
-        window.previewImage = (input) => {
-            if(input.files && input.files[0]) {
-                selectedFile = input.files[0];
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = document.getElementById('img-preview');
-                    img.src = e.target.result; img.classList.remove('hidden');
-                    document.getElementById('img-status').innerText = 'แนบรูปแล้ว (แตะเพื่อเปลี่ยนรูป)';
-                }
-                reader.readAsDataURL(selectedFile);
-            }
-        };
-
-        // Upload to Drive via Apps Script
-        async function uploadImageToDrive(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = async () => {
-                    const base64 = reader.result.split(',')[1];
-                    try {
-                        const response = await fetch(GAS_WEBAPP_URL, {
-                            method: "POST",
-                            body: JSON.stringify({ filename: file.name, mimeType: file.type, base64: base64 })
-                        });
-                        const result = await response.json();
-                        if(result.success) resolve(result.viewUrl);
-                        else reject(result.error);
-                    } catch(e) { reject("อัปโหลดรูปล้มเหลว โปรดลองอีกครั้ง"); }
-                };
-                reader.onerror = () => reject("อ่านไฟล์ไม่สำเร็จ");
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // Submit Form
-        document.getElementById('report-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('submit-btn'); const origText = btn.innerHTML;
-            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังอัปโหลดข้อมูล...';
-
-            try {
-                let imageUrl = "";
-                if(selectedFile) {
-                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> อัปโหลดรูปลงระบบ Drive...';
-                    imageUrl = await uploadImageToDrive(selectedFile);
-                }
-
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึกข้อมูล...';
-                await addDoc(collection(db, "reports"), {
-                    type: "แจ้งเหตุฉุกเฉิน",
-                    location: document.getElementById('location').value,
-                    details: document.getElementById('details').value,
-                    gps: document.getElementById('gps-coords').value,
-                    imageUrl: imageUrl,
-                    status: 'pending',
-                    createdAt: serverTimestamp()
-                });
-
-                Swal.fire({ title: 'สำเร็จ', text: 'ข้อมูลส่งถึงสารวัตรแล้ว', icon: 'success' }).then(()=> { window.location.href = "/"; });
-            } catch (error) { Swal.fire('ล้มเหลว', error.toString(), 'error'); } 
-            finally { btn.disabled = false; btn.innerHTML = origText; }
-        });
-    </script>
-</body>
-</html>
+navigator.geolocation&&navigator.geolocation.getCurrentPosition(p=>{
+  const ll={lat:p.coords.latitude,lng:p.coords.longitude};
+  if(map.distance([SCHOOL.lat,SCHOOL.lng],ll)<1500){map.setView(ll,19);setPos(ll,'✅ ใช้ตำแหน่ง GPS (ลากหมุดเพื่อแก้ไข)');}
+},()=>{},{enableHighAccuracy:true,timeout:8000});
+</script></body></html>
